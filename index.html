@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profitto Growth — Painel Operacional</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --black:    #000000;
-  --bg:       #0a0a0a;
-  --bg2:      #111111;
-  --bg3:      #191919;
-  --bg4:      #222222;
-  --border:   rgba(255,255,255,0.08);
-  --border2:  rgba(255,255,255,0.14);
-  --white:    #ffffff;
-  --off:      rgba(255,255,255,0.55);
-  --dim:      rgba(255,255,255,0.25);
+  --black:    #141416;
+  --bg:       #1a1a1e;
+  --bg2:      #202024;
+  --bg3:      #26262b;
+  --bg4:      #2e2e34;
+  --border:   rgba(255,255,255,0.09);
+  --border2:  rgba(255,255,255,0.16);
+  --white:    #f0f0f2;
+  --off:      rgba(240,240,242,0.6);
+  --dim:      rgba(240,240,242,0.3);
   --green:    #4ade80;
   --green2:   rgba(74,222,128,0.12);
   --red:      #f87171;
@@ -31,7 +31,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  font-family:'DM Sans', sans-serif;
+  font-family:'Outfit', sans-serif;
   background: var(--black);
   color: var(--white);
   min-height: 100vh;
@@ -46,7 +46,7 @@ body::before {
 
 /* ── LOADING ── */
 .loading-screen {
-  position:fixed; inset:0; background:var(--black); z-index:200;
+  position:fixed; inset:0; background:#141416; z-index:200;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
   transition: opacity 0.8s ease, visibility 0.8s ease;
 }
@@ -63,7 +63,7 @@ body::before {
 @keyframes loadBar { to { width:100%; } }
 @keyframes fadeIn { to { opacity:1; } }
 .loading-text {
-  font-family:'DM Sans'; font-size:10px; font-weight:500;
+  font-family:'Outfit'; font-size:10px; font-weight:500;
   letter-spacing:4px; color:var(--dim); text-transform:uppercase;
   opacity:0; animation: fadeIn 0.4s ease 0.8s forwards;
 }
@@ -82,7 +82,7 @@ body::before {
   text-align:center;
 }
 .header-title {
-  font-family:'Playfair Display'; font-size:13px; font-weight:400;
+  font-family:'Outfit'; font-size:13px; font-weight:400;
   letter-spacing:6px; color:var(--dim); text-transform:uppercase;
 }
 .header-right { display:flex; align-items:center; gap:24px; }
@@ -110,7 +110,7 @@ body::before {
   margin-bottom:28px;
 }
 .month-name {
-  font-family:'Playfair Display'; font-size:36px; font-weight:300;
+  font-family:'Outfit'; font-size:32px; font-weight:300;
   font-style:italic; letter-spacing:2px; color:var(--white);
 }
 .month-meta {
@@ -120,7 +120,7 @@ body::before {
   display:flex; flex-direction:column; align-items:flex-end;
 }
 .meta-label { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; margin-bottom:2px; }
-.meta-value { font-family:'EB Garamond'; font-size:20px; font-weight:400; color:var(--white); }
+.meta-value { font-family:'Outfit'; font-size:18px; font-weight:300; color:var(--white); }
 .meta-sep { width:1px; height:32px; background:var(--border); }
 
 /* ── MACRO PROGRESS ── */
@@ -131,7 +131,7 @@ body::before {
 }
 .macro-label-l { font-size:9px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; }
 .macro-pct {
-  font-family:'EB Garamond'; font-size:28px; font-weight:400;
+  font-family:'Outfit'; font-size:26px; font-weight:300;
   color:var(--white); letter-spacing:1px;
 }
 .macro-track {
@@ -177,7 +177,7 @@ body::before {
   color:var(--dim); text-transform:uppercase; margin-bottom:10px;
 }
 .kpi-val {
-  font-family:'EB Garamond'; font-size:32px; font-weight:400;
+  font-family:'Outfit'; font-size:30px; font-weight:300;
   letter-spacing:0.5px; color:var(--white); line-height:1;
 }
 .kpi-val.negative { color:var(--red); }
@@ -202,7 +202,7 @@ body::before {
   margin-bottom:16px;
 }
 .section-title {
-  font-family:'Playfair Display'; font-size:18px; font-weight:400;
+  font-family:'Outfit'; font-size:18px; font-weight:400;
   font-style:italic; color:var(--white); letter-spacing:1px;
 }
 .section-badge {
@@ -231,7 +231,7 @@ body::before {
 .cl-name.pleno  { color:var(--pleno); }
 .cl-name.junior { color:var(--junior); }
 .cl-val {
-  font-family:'EB Garamond'; font-size:24px; font-weight:400;
+  font-family:'Outfit'; font-size:22px; font-weight:300;
   color:var(--white);
 }
 .cl-meta-row { display:flex; justify-content:space-between; margin-bottom:8px; }
@@ -269,7 +269,7 @@ body::before {
 .ra-tag.junior { color:var(--junior); background:rgba(195,176,214,0.08); }
 
 .rv {
-  font-family:'EB Garamond'; font-size:20px; font-weight:400;
+  font-family:'Outfit'; font-size:18px; font-weight:300;
   color:var(--white); text-align:right; white-space:nowrap;
 }
 .rv.negative { color:var(--red); }
