@@ -21,6 +21,9 @@
   --senior:#e2c97e;
   --pleno: #a8c5da;
   --junior:#c3b0d6;
+  --matriz:#7ec8a8;
+  --torres:#a8b8da;
+  --blumenau:#d4a8c5;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -139,6 +142,9 @@ html, body {
 .cl-name.senior { color:var(--senior); }
 .cl-name.pleno  { color:var(--pleno); }
 .cl-name.junior { color:var(--junior); }
+.cl-name.matriz   { color:var(--matriz); }
+.cl-name.torres   { color:var(--torres); }
+.cl-name.blumenau { color:var(--blumenau); }
 .cl-sub { font-size:9px; color:var(--dim); margin-bottom:8px; }
 .cl-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
 .cl-val { font-family:'Outfit'; font-size:24px; font-weight:300; line-height:1; }
@@ -147,11 +153,27 @@ html, body {
 .cl-pct.senior { color:var(--senior); }
 .cl-pct.pleno  { color:var(--pleno); }
 .cl-pct.junior { color:var(--junior); }
+.cl-pct.matriz   { color:var(--matriz); }
+.cl-pct.torres   { color:var(--torres); }
+.cl-pct.blumenau { color:var(--blumenau); }
 .cl-track { height:2px; background:rgba(255,255,255,0.07); border-radius:1px; position:relative; overflow:hidden; }
 .cl-fill { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:1px; transition:width 1.2s ease; }
 .cl-fill.senior { background:var(--senior); }
 .cl-fill.pleno  { background:var(--pleno); }
 .cl-fill.junior { background:var(--junior); }
+.cl-fill.matriz   { background:var(--matriz); }
+.cl-fill.torres   { background:var(--torres); }
+.cl-fill.blumenau { background:var(--blumenau); }
+
+/* AAI tags dentro do card de filial */
+.cl-aais { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+.cl-aai-tag {
+  font-size:8px; font-weight:500; letter-spacing:0.5px;
+  padding:2px 7px; border:1px solid rgba(255,255,255,0.1);
+  color:var(--dim); border-radius:2px;
+  white-space:nowrap;
+}
+.cl-aai-tag.neg { color:var(--red); border-color:rgba(248,113,113,0.2); }
 
 /* ── RIGHT PANEL: RANKING ── */
 .right {
@@ -356,6 +378,15 @@ const NIVEIS = {
 };
 const NIVEL_LABEL = {senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
 
+const FILIAIS = {
+  'Rodrigo Clemente': 'torres',
+  'Diogo Possebon':   'torres',
+  'Cleison Arenhart': 'blumenau',
+};
+// Todos os demais são Matriz
+const FILIAL_LABEL = {matriz:'Matriz · Porto Alegre', torres:'Torres', blumenau:'Blumenau'};
+const FILIAL_ORDER = ['matriz','torres','blumenau'];
+
 function fmt(v){
   if(v===null||v===undefined||isNaN(v)) return '—';
   const abs=Math.abs(v); const neg=v<0?'-':'';
@@ -413,7 +444,8 @@ function processData(rows){
     if(!meta&&!cap) continue;
     const metaFinal=meta||METAS[nome]||0;
     const nivelKey=NIVEIS[nome]||'junior';
-    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],cap,meta:metaFinal});
+    const filialKey=FILIAIS[nome]||'matriz';
+    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],filialKey,cap,meta:metaFinal});
     metaTotal+=metaFinal;
   }
   if(!assessores.length){
@@ -461,22 +493,33 @@ function renderDashboard(assessores,metaTotal){
     else { fill.className='ps-track-fill'; fill.style.width=Math.min(pctTotal*100,100)+'%'; }
   },400);
 
-  // Clusters
-  const cl={senior:{cap:0,meta:0,count:0},pleno:{cap:0,meta:0,count:0},junior:{cap:0,meta:0,count:0}};
-  for(const a of assessores){ const k=a.nivelKey; if(cl[k]){cl[k].cap+=a.cap;cl[k].meta+=a.meta;cl[k].count++;} }
-  const metaInd={senior:'R$ 2M',pleno:'R$ 1,5M',junior:'R$ 1M'};
-  const label={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
-  document.getElementById('cluster-list').innerHTML=['senior','pleno','junior'].map(k=>{
-    const c=cl[k]; const p=c.meta>0?c.cap/c.meta*100:0;
+  // Filiais
+  const fil={
+    matriz:  {cap:0,meta:0,aais:[]},
+    torres:  {cap:0,meta:0,aais:[]},
+    blumenau:{cap:0,meta:0,aais:[]},
+  };
+  for(const a of assessores){
+    const f=fil[a.filialKey];
+    if(f){ f.cap+=a.cap; f.meta+=a.meta; f.aais.push(a); }
+  }
+  const filMetaTotal=Math.max(...FILIAL_ORDER.map(k=>fil[k].meta),1);
+  document.getElementById('cluster-list').innerHTML=FILIAL_ORDER.map(k=>{
+    const f=fil[k]; const p=f.meta>0?f.cap/f.meta*100:0;
     const barW=Math.max(Math.min(p,100),0);
+    const aaiTags=f.aais
+      .sort((a,b)=>b.cap-a.cap)
+      .map(a=>`<span class="cl-aai-tag ${a.cap<0?'neg':''}">${a.nome.split(' ')[0]} ${a.cap<0?'▼':'▲'} ${fmt(a.cap)}</span>`)
+      .join('');
     return `<div class="cluster-card">
-      <div class="cl-name ${k}">${label[k]}</div>
-      <div class="cl-sub">${c.count} assessores · ${metaInd[k]} cada → ${fmt(c.meta)}</div>
+      <div class="cl-name ${k}">${FILIAL_LABEL[k]}</div>
+      <div class="cl-sub">${f.aais.length} assessores · Meta: ${fmt(f.meta)}</div>
       <div class="cl-row">
-        <div class="cl-val ${c.cap<0?'negative':''}">${fmt(c.cap)}</div>
+        <div class="cl-val ${f.cap<0?'negative':''}">${fmt(f.cap)}</div>
         <div class="cl-pct ${k}">${p.toFixed(0)}%</div>
       </div>
       <div class="cl-track"><div class="cl-fill ${k}" data-w="${barW}"></div></div>
+      <div class="cl-aais">${aaiTags}</div>
     </div>`;
   }).join('');
 
