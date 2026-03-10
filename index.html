@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Operacional — Escritório BTG</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --bg: #080B0F;
+    --bg2: #0D1117;
+    --bg3: #131A22;
+    --bg4: #1A2332;
+    --border: rgba(201,168,76,0.2);
+    --text: #E8EDF5;
+    --text-dim: rgba(232,237,245,0.45);
+    --green: #2ECC8B;
+    --green-dim: rgba(46,204,139,0.12);
+    --red: #E05C5C;
+    --red-dim: rgba(224,92,92,0.12);
+    --blue: #4A9EFF;
+    --blue-dim: rgba(74,158,255,0.12);
+    --junior: #4A9EFF;
+    --pleno: #C9A84C;
+    --senior: #2ECC8B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(201,168,76,0.05) 0%, transparent 100%);
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue';
+    font-size: 16px;
+    color: #000;
+    position: relative;
+  }
+
+  .logo-text {
+    font-family: 'Bebas Neue';
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: -2px;
+  }
+
+  .header-center {
+    font-family: 'Bebas Neue';
+    font-size: 13px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(46,204,139,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(46,204,139,0); }
+  }
+
+  .time-display {
+    font-family: 'DM Mono';
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .nav-tab {
+    padding: 14px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    background: linear-gradient(180deg, transparent, rgba(201,168,76,0.04));
+  }
+
+  /* Main Layout */
+  .content {
+    padding: 28px 32px;
+    display: none;
+  }
+  .content.active { display: block; }
+
+  /* KPI Row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .kpi-card:hover { border-color: var(--gold); }
+  .kpi-card:hover::before { opacity: 1; }
+
+  .kpi-card.highlight {
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), var(--bg3));
+    border-color: rgba(201,168,76,0.4);
+  }
+  .kpi-card.highlight::before { opacity: 1; }
+
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .kpi-value {
+    font-family: 'Bebas Neue';
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .badge-up { color: var(--green); }
+  .badge-down { color: var(--red); }
+  .badge-warn { color: var(--gold); }
+
+  /* Progress Bar */
+  .progress-container {
+    margin-top: 12px;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  /* Grid 2 cols */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Section Cards */
+  .card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .card-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .card-body { padding: 20px; }
+
+  /* Ranking Table */
+  .ranking-table {
+    width: 100%;
+  }
+
+  .ranking-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 80px 90px 60px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+
+  .ranking-row:last-child { border-bottom: none; }
+  .ranking-row:hover { background: rgba(255,255,255,0.02); margin: 0 -20px; padding: 10px 20px; border-radius: 4px; }
+
+  .rank-num {
+    font-family: 'DM Mono';
+    font-size: 12px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+
+  .rank-num.top { color: var(--gold); font-weight: 500; }
+
+  .assessor-info {}
+  .assessor-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .assessor-cluster {
+    font-size: 10px;
+    margin-top: 2px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .cluster-junior { color: var(--junior); }
+  .cluster-pleno { color: var(--pleno); }
+  .cluster-senior { color: var(--senior); }
+
+  .rank-value {
+    font-family: 'DM Mono';
+    font-size: 13px;
+    color: var(--text);
+    text-align: right;
+  }
+
+  .rank-bar-cell {}
+
+  .mini-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .mini-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  .fill-junior { background: var(--junior); }
+  .fill-pleno { background: var(--pleno); }
+  .fill-senior { background: var(--senior); }
+
+  .rank-pct {
+    font-family: 'DM Mono';
+    font-size: 11px;
+    text-align: right;
+  }
+
+  /* Cluster Cards */
+  .cluster-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cluster-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .cluster-card.junior::after { background: var(--junior); }
+  .cluster-card.pleno::after { background: var(--pleno); }
+  .cluster-card.senior::after { background: var(--senior); }
+
+  .cluster-title {
+    font-family: 'Bebas Neue';
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .cluster-title.junior { color: var(--junior); }
+  .cluster-title.pleno { color: var(--pleno); }
+  .cluster-title.senior { color: var(--senior); }
+
+  .cluster-meta {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+  }
+
+  .cluster-big {
+    font-family: 'Bebas Neue';
+    font-size: 28px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .cluster-of {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  /* Activity Matrix */
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .activity-cell {
+    background: var(--bg4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .activity-type {
+    font-family: 'Bebas Neue';
+    font-size: 20px;
+    color: var(--gold);
+  }
+
+  .activity-count {
+    font-family: 'DM Mono';
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .activity-pts {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: right;
+    margin-top: 2px;
+  }
+
+  /* Score Ring */
+  .score-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 16px;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .score-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue';
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  /* Ops Cards */
+  .ops-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .ops-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ops-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .ops-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .ops-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .ops-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .ops-count {
+    font-family: 'Bebas Neue';
+    font-size: 36px;
+    color: var(--gold);
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+
+  .ops-alert {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+  }
+
+  /* Velocity Meter */
+  .velocity-section {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .velocity-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .velocity-bar-container {
+    position: relative;
+  }
+
+  .velocity-track {
+    height: 24px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 4px;
+    overflow: visible;
+    position: relative;
+    margin-bottom: 8px;
+  }
+
+  .velocity-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    position: relative;
+    transition: width 2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .velocity-target {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 2px;
+    background: rgba(255,255,255,0.3);
+  }
+
+  .velocity-target-label {
+    position: absolute;
+    top: -22px;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .velocity-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono';
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .pacing-label {
+    font-size: 12px;
+    color: var(--green);
+    font-weight: 500;
+    margin-top: 10px;
+  }
+
+  .pacing-label.warn { color: var(--gold); }
+  .pacing-label.danger { color: var(--red); }
+
+  /* Ranking header row */
+  .ranking-header {
+    display: grid;
+    grid-template-columns: 32px 1fr 80px 90px 60px;
+    gap: 12px;
+    padding: 0 0 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 4px;
+  }
+
+  .ranking-header span {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .ranking-header span:last-child,
+  .ranking-header span:nth-child(3),
+  .ranking-header span:nth-child(4) { text-align: right; }
+
+  /* Tooltip-style info box */
+  .info-box {
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-top: 16px;
+  }
+
+  .info-box strong { color: var(--gold); }
+
+  /* Dividers and helpers */
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* Intensity leaderboard row */
+  .intensity-row {
+    display: grid;
+    grid-template-columns: 28px 1fr 36px 36px 36px 36px 64px;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .intensity-row:last-child { border-bottom: none; }
+
+  .int-rank { font-family: 'DM Mono'; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .int-name { font-size: 12px; font-weight: 500; }
+  .int-count {
+    font-family: 'DM Mono';
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  .int-score {
+    font-family: 'DM Mono';
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+    color: var(--gold);
+  }
+
+  .intensity-header {
+    display: grid;
+    grid-template-columns: 28px 1fr 36px 36px 36px 36px 64px;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 4px;
+  }
+
+  .intensity-header span {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .intensity-header span:nth-child(2) { text-align: left; }
+  .intensity-header span:last-child { text-align: right; }
+
+  /* Metric badge */
+  .metric-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .metric-badge.green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(46,204,139,0.2); }
+  .metric-badge.red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(224,92,92,0.2); }
+  .metric-badge.gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card, .kpi-card, .cluster-card, .ops-card, .velocity-section {
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo-area">
+    <div class="logo-mark">B</div>
+    <div>
+      <div class="logo-text">ESCRITÓRIO BTG</div>
+      <div class="logo-sub">Parceiro BTG Pactual</div>
+    </div>
+  </div>
+  <div class="header-center">Painel Operacional · Março 2025</div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Ao Vivo
+    </div>
+    <div class="time-display" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="showTab('captacao')">Captação</div>
+  <div class="nav-tab" onclick="showTab('intensidade')">Intensidade Comercial</div>
+  <div class="nav-tab" onclick="showTab('operacional')">Operacional</div>
+</div>
+
+<!-- =================== TAB: CAPTAÇÃO =================== -->
+<div class="content active" id="tab-captacao">
+
+  <!-- KPIs principais -->
+  <div class="kpi-row">
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Captação Total</div>
+      <div class="kpi-value">R$ 18,4M</div>
+      <div class="progress-container">
+        <div class="progress-track"><div class="progress-fill" style="width:73%"></div></div>
+      </div>
+      <div class="kpi-sub">
+        <span class="badge-up">▲ 73%</span> da meta mensal
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Meta Total</div>
+      <div class="kpi-value">R$ 25,5M</div>
+      <div class="kpi-sub" style="color:var(--text-dim)">13 assessores · 3 clusters</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Faltam</div>
+      <div class="kpi-value" style="color:var(--gold)">R$ 7,1M</div>
+      <div class="kpi-sub">
+        <span class="badge-warn">⏱</span> 9 dias úteis restantes
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ritmo Diário</div>
+      <div class="kpi-value">R$ 787K</div>
+      <div class="kpi-sub">
+        <span class="badge-up">▲</span> Necessário para bater meta
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Projeção Mês</div>
+      <div class="kpi-value" style="color:var(--green)">R$ 23,1M</div>
+      <div class="kpi-sub">
+        <span class="badge-warn">▲ 90,6%</span> da meta
+      </div>
+    </div>
+  </div>
+
+  <!-- Velocity Bar -->
+  <div class="velocity-section">
+    <div class="velocity-title">Velocidade de Atingimento da Meta — Março 2025</div>
+    <div class="velocity-bar-container">
+      <div class="velocity-track">
+        <div class="velocity-fill" style="width: 73%"></div>
+        <!-- Pacing ideal: 16 dias úteis = ~73% do mês passou -->
+        <div class="velocity-target" style="left: 73%">
+          <div class="velocity-target-label">Ritmo ideal hoje</div>
+        </div>
+      </div>
+    </div>
+    <div class="velocity-labels">
+      <span>R$ 0</span>
+      <span>R$ 6,4M</span>
+      <span>R$ 12,75M</span>
+      <span>R$ 19,1M</span>
+      <span>R$ 25,5M</span>
+    </div>
+    <div class="pacing-label">✓ No ritmo — Captação alinhada com o calendário do mês</div>
+    <div style="margin-top:10px; display:flex; gap:16px; flex-wrap:wrap;">
+      <span class="metric-badge green">▲ Acima do ritmo</span>
+      <span style="font-size:11px; color:var(--text-dim)">16 dias úteis transcorridos de 22</span>
+    </div>
+  </div>
+
+  <!-- Clusters + Ranking -->
+  <div style="display:grid; grid-template-columns: 2fr 3fr; gap: 20px;">
+
+    <!-- Clusters -->
+    <div>
+      <div class="section-title">Por Cluster</div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <div class="cluster-card senior">
+          <div class="cluster-title senior">Sênior</div>
+          <div class="cluster-meta">4 assessores · Meta: R$ 2M cada → R$ 8M total</div>
+          <div class="cluster-big">R$ 7,2M</div>
+          <div class="cluster-of">de R$ 8M · <strong style="color:var(--senior)">90%</strong></div>
+          <div class="progress-track"><div class="progress-fill" style="width:90%; background: linear-gradient(90deg, var(--senior), #5dffc0);"></div></div>
+        </div>
+
+        <div class="cluster-card pleno">
+          <div class="cluster-title pleno">Pleno</div>
+          <div class="cluster-meta">5 assessores · Meta: R$ 1,5M cada → R$ 7,5M total</div>
+          <div class="cluster-big">R$ 5,9M</div>
+          <div class="cluster-of">de R$ 7,5M · <strong style="color:var(--pleno)">79%</strong></div>
+          <div class="progress-track"><div class="progress-fill" style="width:79%; background: linear-gradient(90deg, var(--pleno), var(--gold-light));"></div></div>
+        </div>
+
+        <div class="cluster-card junior">
+          <div class="cluster-title junior">Júnior</div>
+          <div class="cluster-meta">4 assessores · Meta: R$ 1M cada → R$ 4M total</div>
+          <div class="cluster-big">R$ 5,3M</div>
+          <div class="cluster-of">de R$ 4M · <strong style="color:var(--junior)">132%</strong></div>
+          <div class="progress-track"><div class="progress-fill" style="width:100%; background: linear-gradient(90deg, var(--junior), #88ccff);"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Ranking -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Ranking de Captação — Assessores</div>
+        <div class="card-badge metric-badge gold">Mês Atual</div>
+      </div>
+      <div class="card-body">
+        <div class="ranking-header">
+          <span>#</span>
+          <span>Assessor</span>
+          <span style="text-align:right">Captação</span>
+          <span style="text-align:right">vs Meta</span>
+          <span style="text-align:right">%</span>
+        </div>
+
+        <!-- Rank rows -->
+        <div id="ranking-list"></div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =================== TAB: INTENSIDADE =================== -->
+<div class="content" id="tab-intensidade">
+
+  <div class="kpi-row">
+    <div class="kpi-card highlight">
+      <div class="kpi-label">Total de Atividades</div>
+      <div class="kpi-value">347</div>
+      <div class="kpi-sub"><span class="badge-up">▲ 12%</span> vs mês anterior</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pontuação Total</div>
+      <div class="kpi-value">892<span style="font-size:14px; color:var(--text-dim)"> pts</span></div>
+      <div class="kpi-sub">L1×1 + R1/R2/R3×3</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Média por Assessor</div>
+      <div class="kpi-value">68<span style="font-size:14px; color:var(--text-dim)"> pts</span></div>
+      <div class="kpi-sub">13 assessores ativos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Top Atividade</div>
+      <div class="kpi-value">R1</div>
+      <div class="kpi-sub">138 realizadas no mês</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">L1 do Mês</div>
+      <div class="kpi-value">95</div>
+      <div class="kpi-sub"><span class="badge-warn">▲</span> Prospecção ativa</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- Atividades por tipo -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Atividades por Tipo — Visão Geral</div>
+      </div>
+      <div class="card-body">
+        <div class="activity-grid">
+          <div class="activity-cell">
+            <div>
+              <div class="activity-type">L1</div>
+              <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;">LEADS PRIMÁRIOS</div>
+              <div style="margin-top:6px; font-size:11px; color:var(--text-dim)">1 ponto cada</div>
+            </div>
+            <div style="text-align:right">
+              <div class="activity-count">95</div>
+              <div class="activity-pts">95 pts</div>
+            </div>
+          </div>
+          <div class="activity-cell">
+            <div>
+              <div class="activity-type" style="color:var(--green)">R1</div>
+              <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;">REUNIÃO INICIAL</div>
+              <div style="margin-top:6px; font-size:11px; color:var(--text-dim)">3 pontos cada</div>
+            </div>
+            <div style="text-align:right">
+              <div class="activity-count">138</div>
+              <div class="activity-pts">414 pts</div>
+            </div>
+          </div>
+          <div class="activity-cell">
+            <div>
+              <div class="activity-type" style="color:var(--blue)">R2</div>
+              <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;">REUNIÃO APROFUND.</div>
+              <div style="margin-top:6px; font-size:11px; color:var(--text-dim)">3 pontos cada</div>
+            </div>
+            <div style="text-align:right">
+              <div class="activity-count">72</div>
+              <div class="activity-pts">216 pts</div>
+            </div>
+          </div>
+          <div class="activity-cell">
+            <div>
+              <div class="activity-type" style="color:var(--red)">R3</div>
+              <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;">REUNIÃO FECHAMENTO</div>
+              <div style="margin-top:6px; font-size:11px; color:var(--text-dim)">3 pontos cada</div>
+            </div>
+            <div style="text-align:right">
+              <div class="activity-count">42</div>
+              <div class="activity-pts">126 pts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>Fórmula de pontuação:</strong> (L1 × 1) + (R1 × 3) + (R2 × 3) + (R3 × 3)<br>
+          Total de pontos: <strong>95 + 414 + 216 + 126 = 851 pts</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top performers intensity -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Score de Intensidade por Assessor</div>
+        <div class="card-badge metric-badge gold">Pipedrive</div>
+      </div>
+      <div class="card-body">
+        <div class="intensity-header">
+          <span>#</span>
+          <span>Assessor</span>
+          <span>L1</span>
+          <span>R1</span>
+          <span>R2</span>
+          <span>R3</span>
+          <span>Score</span>
+        </div>
+        <div id="intensity-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Formula box -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Fórmulas Google Sheets — Intensidade Comercial</div>
+      <div class="card-badge metric-badge green">Pronto para usar</div>
+    </div>
+    <div class="card-body">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <div class="section-title">Contagem por Tipo</div>
+          <div style="background:var(--bg4); padding:14px; border-radius:6px; font-family:'DM Mono'; font-size:12px; line-height:1.8; color:var(--text-dim); border: 1px solid rgba(255,255,255,0.06);">
+            <span style="color:var(--gold)">=COUNTIFS(</span><br>
+            &nbsp;&nbsp;Atividades!C:C, <span style="color:var(--green)">"L1"</span>,<br>
+            &nbsp;&nbsp;Atividades!B:B, <span style="color:var(--blue)">A2</span><br>
+            <span style="color:var(--gold)">)</span>
+            <br><br>
+            <span style="color:var(--text-dim); font-size:10px;">↑ Conta L1 do assessor em A2<br>Troque "L1" por R1/R2/R3</span>
+          </div>
+        </div>
+        <div>
+          <div class="section-title">Score de Intensidade</div>
+          <div style="background:var(--bg4); padding:14px; border-radius:6px; font-family:'DM Mono'; font-size:12px; line-height:1.8; color:var(--text-dim); border: 1px solid rgba(255,255,255,0.06);">
+            <span style="color:var(--gold)">=</span><span style="color:var(--blue)">B2</span><span style="color:var(--gold)">*1</span> +<br>
+            &nbsp;&nbsp;<span style="color:var(--blue)">C2</span><span style="color:var(--gold)">*3</span> +<br>
+            &nbsp;&nbsp;<span style="color:var(--blue)">D2</span><span style="color:var(--gold)">*3</span> +<br>
+            &nbsp;&nbsp;<span style="color:var(--blue)">E2</span><span style="color:var(--gold)">*3</span>
+            <br><br>
+            <span style="color:var(--text-dim); font-size:10px;">↑ B=L1, C=R1, D=R2, E=R3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- =================== TAB: OPERACIONAL =================== -->
+<div class="content" id="tab-operacional">
+
+  <div class="ops-grid">
+    <div class="ops-card">
+      <div class="ops-alert"></div>
+      <div class="ops-icon">📄</div>
+      <div class="ops-count">47</div>
+      <div class="ops-title">Informes de IR Pendentes</div>
+      <div class="ops-desc">Envio para clientes — prazo: 28/02</div>
+    </div>
+    <div class="ops-card">
+      <div class="ops-icon">🔒</div>
+      <div class="ops-count" style="color:var(--red)">12</div>
+      <div class="ops-title">Contas Bloqueadas</div>
+      <div class="ops-desc">Aguardando regularização ou documentação</div>
+    </div>
+    <div class="ops-card">
+      <div class="ops-icon">✅</div>
+      <div class="ops-count" style="color:var(--green)">23</div>
+      <div class="ops-title">Contas em Abertura</div>
+      <div class="ops-desc">Pipeline de novos clientes em andamento</div>
+    </div>
+    <div class="ops-card">
+      <div class="ops-icon">💡</div>
+      <div class="ops-count">8</div>
+      <div class="ops-title">Oportunidades Comerciais</div>
+      <div class="ops-desc">Identificadas via relatórios do Admin BTG</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- IR Status -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Informes de IR — Status por Assessor</div>
+        <div class="card-badge metric-badge red">3 em atraso</div>
+      </div>
+      <div class="card-body">
+        <div id="ir-list"></div>
+        <div class="info-box" style="margin-top:16px;">
+          <strong>Automatizar no Sheets:</strong> Use coluna STATUS com validação de lista (Enviado / Pendente / Erro). Filtre Pendentes com <strong>=FILTER()</strong> e destaque com formatação condicional vermelho.
+        </div>
+      </div>
+    </div>
+
+    <!-- Contas bloqueadas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Contas Bloqueadas — Motivos</div>
+        <div class="card-badge metric-badge red">Ação Necessária</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--red);">
+            <div>
+              <div style="font-size:13px; font-weight:500;">Documentação Vencida</div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">CPF, RG, comprovante de renda</div>
+            </div>
+            <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--red);">5</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--gold);">
+            <div>
+              <div style="font-size:13px; font-weight:500;">Atualização Cadastral</div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">Dados desatualizados no sistema</div>
+            </div>
+            <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--gold);">4</div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--blue);">
+            <div>
+              <div style="font-size:13px; font-weight:500;">Análise Compliance</div>
+              <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">Pendente revisão interna BTG</div>
+            </div>
+            <div style="font-family:'Bebas Neue'; font-size:24px; color:var(--blue);">3</div>
+          </div>
+
+        </div>
+
+        <div class="info-box" style="margin-top:14px;">
+          <strong>Dica operacional:</strong> Adicione coluna "Responsável" e "Data de Follow-up" na planilha. Programe um lembrete automático via Google Apps Script para alertar assessores por e-mail.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Abertura de contas + oportunidades -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Pipeline de Abertura de Contas</div>
+        <div class="card-badge metric-badge green">23 ativos</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap: 8px;">
+
+          <div style="display:flex; align-items:center; gap:12px; padding: 8px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div style="width:10px; height:10px; border-radius:50%; background:var(--gold); flex-shrink:0;"></div>
+            <div style="flex:1; font-size:12px;">Documentação enviada — aguardando análise</div>
+            <div style="font-family:'DM Mono'; font-size:12px; color:var(--gold);">9</div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; padding: 8px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div style="width:10px; height:10px; border-radius:50%; background:var(--blue); flex-shrink:0;"></div>
+            <div style="flex:1; font-size:12px;">Em análise pelo BTG</div>
+            <div style="font-family:'DM Mono'; font-size:12px; color:var(--blue);">7</div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; padding: 8px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+            <div style="width:10px; height:10px; border-radius:50%; background:#A78BFA; flex-shrink:0;"></div>
+            <div style="flex:1; font-size:12px;">Aprovada — aguardando primeiro aporte</div>
+            <div style="font-family:'DM Mono'; font-size:12px; color:#A78BFA;">5</div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; padding: 8px 0;">
+            <div style="width:10px; height:10px; border-radius:50%; background:var(--green); flex-shrink:0;"></div>
+            <div style="flex:1; font-size:12px;">Primeiro aporte realizado — ativo!</div>
+            <div style="font-family:'DM Mono'; font-size:12px; color:var(--green);">2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Oportunidades Comerciais — Admin BTG</div>
+        <div class="card-badge metric-badge gold">8 identificadas</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex; flex-direction:column; gap: 10px;">
+
+          <div style="padding:12px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--green);">
+            <div style="font-size:12px; font-weight:600; margin-bottom:3px;">Clientes com saldo ocioso em conta</div>
+            <div style="font-size:11px; color:var(--text-dim);">3 clientes · Total R$ 340K parado sem investimento</div>
+            <div style="margin-top:6px;"><span class="metric-badge green">Alta prioridade</span></div>
+          </div>
+
+          <div style="padding:12px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--gold);">
+            <div style="font-size:12px; font-weight:600; margin-bottom:3px;">Vencimento de CDBs / LCIs próximos</div>
+            <div style="font-size:11px; color:var(--text-dim);">3 clientes · Vencimento em até 30 dias</div>
+            <div style="margin-top:6px;"><span class="metric-badge gold">Oportunidade de reinvestimento</span></div>
+          </div>
+
+          <div style="padding:12px 14px; background:var(--bg4); border-radius:6px; border-left:3px solid var(--blue);">
+            <div style="font-size:12px; font-weight:600; margin-bottom:3px;">Clientes sem produto de renda variável</div>
+            <div style="font-size:11px; color:var(--text-dim);">2 clientes com perfil agressivo sem exposição em RV</div>
+            <div style="margin-top:6px;"><span class="metric-badge" style="background:var(--blue-dim); color:var(--blue); border:1px solid rgba(74,158,255,0.2);">Cross-sell</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR');
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Tab switching
+function showTab(tab) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Sample data
+const assessores = [
+  { name: 'Carlos Henrique', cluster: 'senior', captacao: 2100000, meta: 2000000 },
+  { name: 'Fernanda Rocha', cluster: 'senior', captacao: 1980000, meta: 2000000 },
+  { name: 'Rafael Cunha',   cluster: 'senior', captacao: 1850000, meta: 2000000 },
+  { name: 'Ana Lima',       cluster: 'junior', captacao: 1650000, meta: 1000000 },
+  { name: 'Bruno Matos',    cluster: 'pleno',  captacao: 1550000, meta: 1500000 },
+  { name: 'Julia Alves',    cluster: 'pleno',  captacao: 1420000, meta: 1500000 },
+  { name: 'Pedro Nunes',    cluster: 'junior', captacao: 1310000, meta: 1000000 },
+  { name: 'Mariana Costa',  cluster: 'senior', captacao: 1270000, meta: 2000000 },
+  { name: 'Thiago Ferreira',cluster: 'pleno',  captacao: 1200000, meta: 1500000 },
+  { name: 'Camila Pires',   cluster: 'pleno',  captacao: 980000,  meta: 1500000 },
+  { name: 'Diego Santos',   cluster: 'junior', captacao: 820000,  meta: 1000000 },
+  { name: 'Leticia Vieira', cluster: 'pleno',  captacao: 750000,  meta: 1500000 },
+  { name: 'Lucas Barros',   cluster: 'junior', captacao: 520000,  meta: 1000000 },
+];
+
+const intensidadeData = [
+  { name: 'Carlos Henrique', l1: 12, r1: 18, r2: 10, r3: 7 },
+  { name: 'Fernanda Rocha',  l1: 10, r1: 15, r2: 9,  r3: 6 },
+  { name: 'Rafael Cunha',    l1: 8,  r1: 14, r2: 8,  r3: 5 },
+  { name: 'Ana Lima',        l1: 9,  r1: 12, r2: 7,  r3: 4 },
+  { name: 'Bruno Matos',     l1: 7,  r1: 11, r2: 7,  r3: 4 },
+  { name: 'Julia Alves',     l1: 6,  r1: 10, r2: 6,  r3: 3 },
+  { name: 'Pedro Nunes',     l1: 8,  r1: 9,  r2: 5,  r3: 3 },
+  { name: 'Mariana Costa',   l1: 5,  r1: 10, r2: 4,  r3: 3 },
+  { name: 'Thiago Ferreira', l1: 7,  r1: 8,  r2: 5,  r3: 2 },
+  { name: 'Camila Pires',    l1: 6,  r1: 8,  r2: 4,  r3: 2 },
+  { name: 'Diego Santos',    l1: 8,  r1: 7,  r2: 3,  r3: 2 },
+  { name: 'Leticia Vieira',  l1: 5,  r1: 7,  r2: 3,  r3: 1 },
+  { name: 'Lucas Barros',    l1: 4,  r1: 9,  r2: 3,  r3: 1 },
+];
+
+function fmt(v) {
+  if (v >= 1000000) return 'R$ ' + (v/1000000).toFixed(1) + 'M';
+  if (v >= 1000) return 'R$ ' + (v/1000).toFixed(0) + 'K';
+  return 'R$ ' + v;
+}
+
+function buildRanking() {
+  const sorted = [...assessores].sort((a,b) => b.captacao - a.captacao);
+  const max = sorted[0].captacao;
+  const html = sorted.map((a, i) => {
+    const pct = Math.round(a.captacao / a.meta * 100);
+    const barPct = Math.round(a.captacao / max * 100);
+    const fillClass = 'fill-' + a.cluster;
+    const rankClass = i < 3 ? 'top' : '';
+    const pctColor = pct >= 100 ? 'var(--green)' : pct >= 70 ? 'var(--gold)' : 'var(--red)';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+    return `
+      <div class="ranking-row">
+        <div class="rank-num ${rankClass}">${medal}</div>
+        <div class="assessor-info">
+          <div class="assessor-name">${a.name}</div>
+          <div class="assessor-cluster cluster-${a.cluster}">${a.cluster.charAt(0).toUpperCase()+a.cluster.slice(1)}</div>
+        </div>
+        <div class="rank-value">${fmt(a.captacao)}</div>
+        <div>
+          <div class="mini-bar"><div class="mini-fill ${fillClass}" style="width:${barPct}%"></div></div>
+          <div style="font-family:'DM Mono';font-size:10px;color:var(--text-dim);margin-top:3px;text-align:right;">${fmt(a.meta)}</div>
+        </div>
+        <div class="rank-pct" style="color:${pctColor}">${pct}%</div>
+      </div>`;
+  }).join('');
+  document.getElementById('ranking-list').innerHTML = html;
+}
+
+function buildIntensity() {
+  const scored = intensidadeData.map(a => ({
+    ...a,
+    score: a.l1*1 + a.r1*3 + a.r2*3 + a.r3*3
+  })).sort((a,b) => b.score - a.score);
+
+  const html = scored.map((a, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+    return `
+      <div class="intensity-row">
+        <div class="int-rank">${medal}</div>
+        <div class="int-name">${a.name}</div>
+        <div class="int-count">${a.l1}</div>
+        <div class="int-count">${a.r1}</div>
+        <div class="int-count">${a.r2}</div>
+        <div class="int-count">${a.r3}</div>
+        <div class="int-score">${a.score} pts</div>
+      </div>`;
+  }).join('');
+  document.getElementById('intensity-list').innerHTML = html;
+}
+
+function buildIR() {
+  const data = [
+    { name: 'Carlos Henrique', status: 'Enviado', qtd: 47 },
+    { name: 'Fernanda Rocha',  status: 'Enviado', qtd: 38 },
+    { name: 'Rafael Cunha',    status: 'Parcial', qtd: 31 },
+    { name: 'Ana Lima',        status: 'Pendente', qtd: 22 },
+    { name: 'Bruno Matos',     status: 'Pendente', qtd: 19 },
+    { name: 'Julia Alves',     status: 'Enviado', qtd: 18 },
+  ];
+
+  const statusColor = { 'Enviado': 'var(--green)', 'Parcial': 'var(--gold)', 'Pendente': 'var(--red)' };
+  const statusBg = { 'Enviado': 'var(--green-dim)', 'Parcial': 'var(--gold-dim)', 'Pendente': 'var(--red-dim)' };
+
+  const html = data.map(d => `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+      <div>
+        <div style="font-size:13px; font-weight:500;">${d.name}</div>
+        <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">${d.qtd} clientes</div>
+      </div>
+      <div style="padding:4px 12px; border-radius:20px; font-size:11px; font-weight:500; background:${statusBg[d.status]}; color:${statusColor[d.status]}; border:1px solid ${statusColor[d.status]}33;">
+        ${d.status}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('ir-list').innerHTML = html;
+}
+
+buildRanking();
+buildIntensity();
+buildIR();
+</script>
+</body>
+</html>
