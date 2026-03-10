@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profitto Growth — Painel Operacional</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
   --black:    #141416;
@@ -51,7 +51,7 @@ body::before {
   transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 .loading-screen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-.loading-logo { width:200px; opacity:0; animation: fadeIn 0.6s ease 0.2s forwards; }
+.loading-logo { width:200px; opacity:0; animation: fadeIn 0.6s ease 0.2s forwards; mix-blend-mode:screen; }
 .loading-bar-wrap {
   width:200px; height:1px; background:rgba(255,255,255,0.1);
   overflow:hidden;
@@ -76,7 +76,7 @@ body::before {
   border-bottom: 1px solid var(--border);
   background: var(--black);
 }
-.logo-img { height:28px; display:block; }
+.logo-img { height:28px; display:block; mix-blend-mode:screen; }
 .header-center {
   position:absolute; left:50%; transform:translateX(-50%);
   text-align:center;
@@ -258,7 +258,7 @@ body::before {
   color:var(--dim); text-align:center; width:28px;
 }
 .rn.top { font-size:14px; color:var(--white); }
-.ra-name { font-size:12px; font-weight:500; color:var(--white); letter-spacing:0.2px; }
+.ra-name { font-family: 'DM Sans', sans-serif; font-size:13px; font-weight:400; color:var(--white); letter-spacing:0.2px; }
 .ra-tag {
   display:inline-block; margin-top:3px;
   font-size:7px; font-weight:700; letter-spacing:3px;
