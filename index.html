@@ -206,43 +206,6 @@ body::before {
   font-family:'DM Mono'; font-size:9px; color:var(--dim);
 }
 
-/* ── KPI GRID ── */
-.kpi-grid {
-  display:grid; grid-template-columns:repeat(5,1fr); gap:1px;
-  margin-bottom:28px;
-  border:1px solid var(--border);
-  background: var(--border);
-}
-.kpi {
-  background: var(--bg);
-  padding:22px 20px; position:relative; overflow:hidden;
-  transition: background 0.2s ease;
-}
-.kpi:hover { background: var(--bg2); }
-.kpi-label {
-  font-size:8px; font-weight:600; letter-spacing:3px;
-  color:var(--dim); text-transform:uppercase; margin-bottom:10px;
-}
-.kpi-val {
-  font-family:'Outfit'; font-size:30px; font-weight:300;
-  letter-spacing:0.5px; color:var(--white); line-height:1;
-}
-.kpi-val.negative { color:var(--red); }
-.kpi-sub {
-  font-size:9px; font-weight:500; letter-spacing:2px;
-  margin-top:6px; text-transform:uppercase;
-}
-.kpi-sub.up { color:var(--green); }
-.kpi-sub.down { color:var(--red); }
-.kpi-sub.warn { color:var(--gold); }
-.kpi-sub.neutral { color:var(--dim); }
-.kpi-accent {
-  position:absolute; top:0; left:0; right:0; height:1px;
-  background: var(--white); opacity:0;
-  transition: opacity 0.3s;
-}
-.kpi.featured .kpi-accent { opacity:0.3; }
-
 /* ── SECTION TITLE ── */
 .section-head {
   display:flex; align-items:center; justify-content:space-between;
@@ -539,40 +502,6 @@ body::before {
     </div>
   </div>
 
-  <!-- KPI GRID -->
-  <div class="kpi-grid">
-    <div class="kpi featured">
-      <div class="kpi-accent"></div>
-      <div class="kpi-label">Captação Total</div>
-      <div class="kpi-val" id="kpi-total">—</div>
-      <div class="kpi-sub neutral" id="kpi-pct-total">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent"></div>
-      <div class="kpi-label">Meta do Mês</div>
-      <div class="kpi-val" id="kpi-meta">—</div>
-      <div class="kpi-sub neutral">Captação líquida</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent"></div>
-      <div class="kpi-label">Falta para Meta</div>
-      <div class="kpi-val" id="kpi-falta">—</div>
-      <div class="kpi-sub neutral" id="kpi-falta-sub">—</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent"></div>
-      <div class="kpi-label">Ritmo Necessário / Dia</div>
-      <div class="kpi-val" id="kpi-ritmo">—</div>
-      <div class="kpi-sub neutral">por dia útil restante</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-accent"></div>
-      <div class="kpi-label">Projeção de Fechamento</div>
-      <div class="kpi-val" id="kpi-proj">—</div>
-      <div class="kpi-sub neutral" id="kpi-proj-sub">—</div>
-    </div>
-  </div>
-
   <!-- BOTTOM GRID -->
   <div class="bottom-grid">
 
@@ -726,33 +655,6 @@ function renderDashboard(assessores,metaTotal){
   // Month meta
   document.getElementById('dias-passados').textContent=DIAS_UTEIS_PASSADOS;
   document.getElementById('dias-restantes').textContent=diasRest;
-
-  // KPIs
-  const kpiTotal=document.getElementById('kpi-total');
-  kpiTotal.textContent=fmt(capTotal);
-  if(capTotal<0) kpiTotal.classList.add('negative'); else kpiTotal.classList.remove('negative');
-
-  document.getElementById('kpi-meta').textContent=fmt(metaTotal);
-  document.getElementById('kpi-falta').textContent=fmt(falta);
-  document.getElementById('kpi-ritmo').textContent=fmt(ritmo);
-
-  const projEl=document.getElementById('kpi-proj');
-  projEl.textContent=fmt(proj);
-  if(proj<0) projEl.classList.add('negative'); else projEl.classList.remove('negative');
-
-  // KPI sub badges
-  const pctSub=document.getElementById('kpi-pct-total');
-  const pctStr=(pctTotal*100).toFixed(1)+'%';
-  pctSub.textContent=pctStr+' da meta';
-  pctSub.className='kpi-sub '+(pctTotal>=pctIdeal?'up':'down');
-
-  const faltaSub=document.getElementById('kpi-falta-sub');
-  faltaSub.textContent=diasRest+' dias úteis restantes';
-
-  const projSub=document.getElementById('kpi-proj-sub');
-  const projPct=(proj/metaTotal*100).toFixed(1)+'%';
-  projSub.textContent=projPct+' da meta';
-  projSub.className='kpi-sub '+(proj>=metaTotal?'up':'warn');
 
   // Macro progress — contextual
   const idealVal = metaTotal * pctIdeal;          // onde deveria estar em R$
