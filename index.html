@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profitto Growth — Painel Operacional</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
   --black:    #000000;
@@ -31,7 +31,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  font-family:'Montserrat', sans-serif;
+  font-family:'DM Sans', sans-serif;
   background: var(--black);
   color: var(--white);
   min-height: 100vh;
@@ -63,7 +63,7 @@ body::before {
 @keyframes loadBar { to { width:100%; } }
 @keyframes fadeIn { to { opacity:1; } }
 .loading-text {
-  font-family:'Montserrat'; font-size:10px; font-weight:500;
+  font-family:'DM Sans'; font-size:10px; font-weight:500;
   letter-spacing:4px; color:var(--dim); text-transform:uppercase;
   opacity:0; animation: fadeIn 0.4s ease 0.8s forwards;
 }
@@ -82,7 +82,7 @@ body::before {
   text-align:center;
 }
 .header-title {
-  font-family:'Cormorant Garamond'; font-size:13px; font-weight:400;
+  font-family:'Playfair Display'; font-size:13px; font-weight:400;
   letter-spacing:6px; color:var(--dim); text-transform:uppercase;
 }
 .header-right { display:flex; align-items:center; gap:24px; }
@@ -97,7 +97,7 @@ body::before {
 }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 .clock {
-  font-family:'JetBrains Mono'; font-size:12px; font-weight:300;
+  font-family:'DM Mono'; font-size:12px; font-weight:300;
   color:var(--dim); letter-spacing:1px;
 }
 
@@ -110,7 +110,7 @@ body::before {
   margin-bottom:28px;
 }
 .month-name {
-  font-family:'Cormorant Garamond'; font-size:36px; font-weight:300;
+  font-family:'Playfair Display'; font-size:36px; font-weight:300;
   font-style:italic; letter-spacing:2px; color:var(--white);
 }
 .month-meta {
@@ -120,7 +120,7 @@ body::before {
   display:flex; flex-direction:column; align-items:flex-end;
 }
 .meta-label { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; margin-bottom:2px; }
-.meta-value { font-family:'Cormorant Garamond'; font-size:18px; font-weight:400; color:var(--white); }
+.meta-value { font-family:'EB Garamond'; font-size:20px; font-weight:400; color:var(--white); }
 .meta-sep { width:1px; height:32px; background:var(--border); }
 
 /* ── MACRO PROGRESS ── */
@@ -131,7 +131,7 @@ body::before {
 }
 .macro-label-l { font-size:9px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; }
 .macro-pct {
-  font-family:'Cormorant Garamond'; font-size:26px; font-weight:300;
+  font-family:'EB Garamond'; font-size:28px; font-weight:400;
   color:var(--white); letter-spacing:1px;
 }
 .macro-track {
@@ -156,7 +156,7 @@ body::before {
 .macro-ticks {
   display:flex; justify-content:space-between;
   margin-top:6px;
-  font-family:'JetBrains Mono'; font-size:9px; color:var(--dim);
+  font-family:'DM Mono'; font-size:9px; color:var(--dim);
 }
 
 /* ── KPI GRID ── */
@@ -177,7 +177,7 @@ body::before {
   color:var(--dim); text-transform:uppercase; margin-bottom:10px;
 }
 .kpi-val {
-  font-family:'Cormorant Garamond'; font-size:28px; font-weight:400;
+  font-family:'EB Garamond'; font-size:32px; font-weight:400;
   letter-spacing:0.5px; color:var(--white); line-height:1;
 }
 .kpi-val.negative { color:var(--red); }
@@ -202,7 +202,7 @@ body::before {
   margin-bottom:16px;
 }
 .section-title {
-  font-family:'Cormorant Garamond'; font-size:18px; font-weight:400;
+  font-family:'Playfair Display'; font-size:18px; font-weight:400;
   font-style:italic; color:var(--white); letter-spacing:1px;
 }
 .section-badge {
@@ -231,7 +231,7 @@ body::before {
 .cl-name.pleno  { color:var(--pleno); }
 .cl-name.junior { color:var(--junior); }
 .cl-val {
-  font-family:'Cormorant Garamond'; font-size:22px; font-weight:400;
+  font-family:'EB Garamond'; font-size:24px; font-weight:400;
   color:var(--white);
 }
 .cl-meta-row { display:flex; justify-content:space-between; margin-bottom:8px; }
@@ -254,7 +254,7 @@ body::before {
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
 .rn {
-  font-family:'JetBrains Mono'; font-size:10px; font-weight:400;
+  font-family:'DM Mono'; font-size:10px; font-weight:400;
   color:var(--dim); text-align:center; width:28px;
 }
 .rn.top { font-size:14px; color:var(--white); }
@@ -269,7 +269,7 @@ body::before {
 .ra-tag.junior { color:var(--junior); background:rgba(195,176,214,0.08); }
 
 .rv {
-  font-family:'Cormorant Garamond'; font-size:18px; font-weight:400;
+  font-family:'EB Garamond'; font-size:20px; font-weight:400;
   color:var(--white); text-align:right; white-space:nowrap;
 }
 .rv.negative { color:var(--red); }
@@ -283,7 +283,7 @@ body::before {
 .rb-meta { font-size:9px; color:var(--dim); text-align:right; }
 
 .rp {
-  font-family:'JetBrains Mono'; font-size:11px; font-weight:400;
+  font-family:'DM Mono'; font-size:11px; font-weight:400;
   text-align:right;
 }
 
