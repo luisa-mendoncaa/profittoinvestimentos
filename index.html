@@ -165,7 +165,38 @@ html, body {
 .cl-fill.torres   { background:var(--torres); }
 .cl-fill.blumenau { background:var(--blumenau); }
 
-/* AAI tags dentro do card de filial */
+/* níveis compacto */
+.nivel-strip {
+  flex-shrink:0;
+  border-top:1px solid var(--border);
+  padding:8px 18px;
+  display:flex; flex-direction:column; gap:5px;
+}
+.nivel-strip-title {
+  font-size:7px; font-weight:700; letter-spacing:3px;
+  color:var(--dim); text-transform:uppercase; margin-bottom:4px;
+}
+.nivel-row {
+  display:grid; grid-template-columns:52px 1fr 44px;
+  align-items:center; gap:8px;
+}
+.nivel-label {
+  font-size:8px; font-weight:700; letter-spacing:3px;
+  text-transform:uppercase;
+}
+.nivel-label.senior { color:var(--senior); }
+.nivel-label.pleno  { color:var(--pleno); }
+.nivel-label.junior { color:var(--junior); }
+.nivel-track { height:2px; background:rgba(255,255,255,0.07); border-radius:1px; position:relative; overflow:hidden; }
+.nivel-fill  { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:1px; transition:width 1.2s ease; }
+.nivel-fill.senior { background:var(--senior); }
+.nivel-fill.pleno  { background:var(--pleno); }
+.nivel-fill.junior { background:var(--junior); }
+.nivel-val {
+  font-family:'DM Mono'; font-size:9px; font-weight:400;
+  text-align:right; white-space:nowrap;
+}
+.nivel-val.neg { color:var(--red); }
 .cl-aais { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
 .cl-aai-tag {
   font-size:8px; font-weight:500; letter-spacing:0.5px;
@@ -329,9 +360,14 @@ html, body {
         </div>
       </div>
 
-      <!-- CLUSTERS -->
+      <!-- FILIAIS -->
       <div class="clusters" id="cluster-list">
         <div style="color:var(--dim);font-size:11px;padding:10px 0">Carregando...</div>
+      </div>
+
+      <!-- NÍVEIS COMPACTO -->
+      <div class="nivel-strip" id="nivel-strip">
+        <div style="color:var(--dim);font-size:11px;padding:8px 18px">Carregando...</div>
       </div>
 
     </div>
@@ -523,7 +559,20 @@ function renderDashboard(assessores,metaTotal){
     </div>`;
   }).join('');
 
-  // Ranking
+  // Níveis compacto
+  const nv={senior:{cap:0,meta:0},pleno:{cap:0,meta:0},junior:{cap:0,meta:0}};
+  for(const a of assessores){ const k=a.nivelKey; if(nv[k]){nv[k].cap+=a.cap;nv[k].meta+=a.meta;} }
+  const nvLabel={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
+  document.getElementById('nivel-strip').innerHTML=
+    `<div class="nivel-strip-title">Por Nível</div>`+
+    ['senior','pleno','junior'].map(k=>{
+      const n=nv[k]; const p=n.meta>0?Math.max(Math.min(n.cap/n.meta*100,100),0):0;
+      return `<div class="nivel-row">
+        <div class="nivel-label ${k}">${nvLabel[k]}</div>
+        <div class="nivel-track"><div class="nivel-fill ${k}" data-w="${p}"></div></div>
+        <div class="nivel-val ${n.cap<0?'neg':''}">${fmt(n.cap)}</div>
+      </div>`;
+    }).join('');
   const sorted=[...assessores].sort((a,b)=>b.cap-a.cap);
   const maxCap=Math.max(...sorted.map(a=>Math.abs(a.cap)),1);
   document.getElementById('ranking-badge').textContent='Mês Atual';
