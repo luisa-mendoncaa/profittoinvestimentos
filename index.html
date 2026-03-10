@@ -125,37 +125,84 @@ body::before {
 
 /* ── MACRO PROGRESS ── */
 .macro-bar-section { margin-bottom:28px; }
-.macro-labels {
-  display:flex; justify-content:space-between; align-items:center;
-  margin-bottom:8px;
+.macro-section {
+  margin-bottom:28px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
 }
-.macro-label-l { font-size:9px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; }
-.macro-pct {
-  font-family:'Outfit'; font-size:26px; font-weight:300;
-  color:var(--white); letter-spacing:1px;
+.macro-top {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom:18px;
 }
+.macro-title { font-size:9px; font-weight:600; letter-spacing:3px; color:var(--dim); text-transform:uppercase; }
+.macro-numbers { display:flex; gap:32px; align-items:flex-end; }
+.macro-num-block { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.macro-num-label { font-size:8px; font-weight:500; letter-spacing:2px; color:var(--dim); text-transform:uppercase; }
+.macro-num-val {
+  font-family:'Outfit'; font-size:22px; font-weight:300;
+  color:var(--white); line-height:1;
+}
+.macro-num-val.negative { color:var(--red); }
+.macro-num-val.highlight { font-size:28px; }
+
+/* track duplo: ideal + real */
+.macro-track-wrap { position:relative; margin-bottom:10px; }
 .macro-track {
-  position:relative; height:2px; background:rgba(255,255,255,0.08);
-  overflow:visible;
+  position:relative; height:6px;
+  background:rgba(255,255,255,0.06);
+  border-radius:3px; overflow:visible;
 }
-.macro-fill {
+/* trilha do ideal (onde deveria estar) */
+.macro-track-ideal {
   position:absolute; top:0; left:0; height:100%;
-  background: var(--white); width:0%;
+  background: rgba(212,175,106,0.25);
+  border-radius:3px;
   transition: width 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
+/* trilha do real */
+.macro-fill {
+  position:absolute; top:0; left:0; height:100%;
+  border-radius:3px; width:0%;
+  transition: width 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.macro-fill.positive { background: var(--white); }
+.macro-fill.zero { background: var(--red); width: 2px !important; }
+.macro-fill.negative { background: var(--red); width: 2px !important; }
+
+/* marcador pontilhado de "onde deveria estar" */
 .macro-ideal-marker {
-  position:absolute; top:-5px; height:12px; width:1px;
-  background: var(--gold); opacity:0.8;
+  position:absolute; top:-6px; height:18px; width:2px;
+  background: var(--gold);
   transition: left 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .macro-ideal-label {
-  position:absolute; top:-20px; left:-16px;
-  font-size:8px; font-weight:500; letter-spacing:2px;
+  position:absolute; top:-20px; left:4px;
+  font-size:8px; font-weight:600; letter-spacing:2px;
   color:var(--gold); text-transform:uppercase; white-space:nowrap;
 }
+.macro-ideal-val {
+  position:absolute; bottom:-18px; left:4px;
+  font-size:8px; font-weight:400; color:var(--gold); white-space:nowrap;
+  font-family:'DM Mono';
+}
+
+/* gap indicator — mostra quanto falta visualmente */
+.macro-gap-row {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:22px;
+}
+.macro-gap-item { display:flex; flex-direction:column; gap:2px; }
+.macro-gap-label { font-size:8px; font-weight:500; letter-spacing:2px; color:var(--dim); text-transform:uppercase; }
+.macro-gap-val { font-family:'DM Mono'; font-size:12px; font-weight:400; color:var(--white); }
+.macro-gap-val.bad { color:var(--red); }
+.macro-gap-val.good { color:var(--green); }
+.macro-gap-val.warn { color:var(--gold); }
+.macro-sep-v { width:1px; height:32px; background:var(--border); }
+
 .macro-ticks {
   display:flex; justify-content:space-between;
-  margin-top:6px;
+  margin-top:8px;
   font-family:'DM Mono'; font-size:9px; color:var(--dim);
 }
 
@@ -381,23 +428,66 @@ body::before {
   </div>
 
   <!-- MACRO PROGRESS -->
-  <div class="macro-bar-section">
-    <div class="macro-labels">
-      <div class="macro-label-l">Progresso da Meta do Escritório</div>
-      <div class="macro-pct" id="macro-pct">—</div>
-    </div>
-    <div class="macro-track">
-      <div class="macro-fill" id="macro-fill"></div>
-      <div class="macro-ideal-marker" id="macro-ideal" style="left:0%">
-        <div class="macro-ideal-label">Ideal</div>
+  <div class="macro-section">
+    <div class="macro-top">
+      <div class="macro-title">Progresso da Meta — Março 2026</div>
+      <div class="macro-numbers">
+        <div class="macro-num-block">
+          <div class="macro-num-label">Captado</div>
+          <div class="macro-num-val negative highlight" id="macro-captado">—</div>
+        </div>
+        <div class="macro-sep-v"></div>
+        <div class="macro-num-block">
+          <div class="macro-num-label">Deveria estar em</div>
+          <div class="macro-num-val" id="macro-ideal-val">—</div>
+        </div>
+        <div class="macro-sep-v"></div>
+        <div class="macro-num-block">
+          <div class="macro-num-label">Meta total</div>
+          <div class="macro-num-val" id="macro-meta-val">—</div>
+        </div>
       </div>
     </div>
+
+    <div class="macro-track-wrap">
+      <div class="macro-track">
+        <div class="macro-track-ideal" id="macro-track-ideal"></div>
+        <div class="macro-fill" id="macro-fill"></div>
+        <div class="macro-ideal-marker" id="macro-ideal" style="left:0%">
+          <div class="macro-ideal-label">Ideal hoje</div>
+          <div class="macro-ideal-val" id="macro-ideal-pct">—</div>
+        </div>
+      </div>
+    </div>
+
     <div class="macro-ticks">
       <span>R$ 0</span>
       <span id="t1">—</span>
       <span id="t2">—</span>
       <span id="t3">—</span>
       <span id="t4">—</span>
+    </div>
+
+    <div class="macro-gap-row">
+      <div class="macro-gap-item">
+        <div class="macro-gap-label">% da meta atingida</div>
+        <div class="macro-gap-val" id="macro-pct">—</div>
+      </div>
+      <div class="macro-sep-v"></div>
+      <div class="macro-gap-item">
+        <div class="macro-gap-label">% ideal no calendário</div>
+        <div class="macro-gap-val warn" id="macro-ideal-pct2">—</div>
+      </div>
+      <div class="macro-sep-v"></div>
+      <div class="macro-gap-item">
+        <div class="macro-gap-label">Defasagem</div>
+        <div class="macro-gap-val bad" id="macro-gap">—</div>
+      </div>
+      <div class="macro-sep-v"></div>
+      <div class="macro-gap-item">
+        <div class="macro-gap-label">Ritmo necessário / dia</div>
+        <div class="macro-gap-val" id="macro-ritmo">—</div>
+      </div>
     </div>
   </div>
 
@@ -612,12 +702,50 @@ function renderDashboard(assessores,metaTotal){
   projSub.textContent=projPct+' da meta';
   projSub.className='kpi-sub '+(proj>=metaTotal?'up':'warn');
 
-  // Macro progress
-  document.getElementById('macro-pct').textContent=(pctTotal*100).toFixed(1)+'%';
+  // Macro progress — contextual
+  const idealVal = metaTotal * pctIdeal;          // onde deveria estar em R$
+  const defasagem = idealVal - capTotal;           // quanto está abaixo do ideal
+  const pctRealStr  = (pctTotal*100).toFixed(1)+'%';
+  const pctIdealStr = (pctIdeal*100).toFixed(1)+'%';
+  const defasagemStr= defasagem > 0 ? '-'+fmt(defasagem) : '✓ '+fmt(Math.abs(defasagem));
+
+  // números no topo
+  const captadoEl = document.getElementById('macro-captado');
+  captadoEl.textContent = fmt(capTotal);
+  captadoEl.className = 'macro-num-val highlight ' + (capTotal < 0 ? 'negative' : '');
+
+  document.getElementById('macro-ideal-val').textContent  = fmt(idealVal);
+  document.getElementById('macro-meta-val').textContent   = fmt(metaTotal);
+
+  // linha de gap
+  document.getElementById('macro-pct').textContent        = pctRealStr;
+  document.getElementById('macro-pct').className          = 'macro-gap-val ' + (pctTotal >= pctIdeal ? 'good' : 'bad');
+  document.getElementById('macro-ideal-pct2').textContent = pctIdealStr;
+  document.getElementById('macro-gap').textContent        = defasagem > 0 ? '-'+fmt(defasagem) : '✓ no ritmo';
+  document.getElementById('macro-gap').className          = 'macro-gap-val ' + (defasagem > 0 ? 'bad' : 'good');
+  document.getElementById('macro-ritmo').textContent      = fmt(ritmo)+'/dia';
+
+  // marcador de % no marker flutuante
+  document.getElementById('macro-ideal-pct').textContent = pctIdealStr;
+
+  // barra — sempre mostra algo: mínimo 2px quando negativo
+  const fillPct = Math.max(pctTotal * 100, 0);
   setTimeout(()=>{
-    document.getElementById('macro-fill').style.width=Math.min(pctTotal*100,100)+'%';
-    document.getElementById('macro-ideal').style.left=Math.min(pctIdeal*100,100)+'%';
-  },400);
+    const fill = document.getElementById('macro-fill');
+    const ideal = document.getElementById('macro-ideal');
+    const trackIdeal = document.getElementById('macro-track-ideal');
+    const idealLeft = Math.min(pctIdeal*100, 100);
+
+    trackIdeal.style.width = idealLeft + '%';
+    ideal.style.left = idealLeft + '%';
+
+    if(capTotal <= 0){
+      fill.className = 'macro-fill negative';
+    } else {
+      fill.className = 'macro-fill positive';
+      fill.style.width = Math.min(fillPct, 100) + '%';
+    }
+  }, 400);
 
   // Ticks
   for(let i=1;i<=4;i++) document.getElementById('t'+i).textContent=fmt(metaTotal*i/4);
