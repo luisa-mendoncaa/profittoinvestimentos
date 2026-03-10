@@ -260,77 +260,125 @@ body::before {
 
 /* ── BOTTOM GRID ── */
 .bottom-grid {
-  display:grid; grid-template-columns:340px 1fr; gap:1px;
-  margin-bottom:28px; background:var(--border); border:1px solid var(--border);
+  display:grid; grid-template-columns:380px 1fr; gap:20px;
+  margin-bottom:28px;
 }
-.panel { background:var(--bg); padding:24px; }
+.panel { background: rgba(0,0,0,0.2); border:1px solid var(--border); padding:24px; }
 
 /* ── CLUSTERS ── */
-.cluster-item {
-  padding:16px 0; border-bottom:1px solid var(--border);
+.panel-label {
+  font-size:8px; font-weight:700; letter-spacing:4px;
+  color:var(--dim); text-transform:uppercase; margin-bottom:16px;
 }
-.cluster-item:last-child { border-bottom:none; }
-.cl-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.cluster-card {
+  border:1px solid var(--border);
+  padding:18px 20px; margin-bottom:12px;
+  position:relative; overflow:hidden;
+}
+.cluster-card:last-child { margin-bottom:0; }
 .cl-name {
-  font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  font-size:10px; font-weight:700; letter-spacing:4px;
+  text-transform:uppercase; margin-bottom:4px;
 }
 .cl-name.senior { color:var(--senior); }
 .cl-name.pleno  { color:var(--pleno); }
 .cl-name.junior { color:var(--junior); }
-.cl-val {
-  font-family:'Outfit'; font-size:22px; font-weight:300;
-  color:var(--white);
+.cl-sub {
+  font-size:10px; color:var(--dim); margin-bottom:12px;
 }
-.cl-meta-row { display:flex; justify-content:space-between; margin-bottom:8px; }
+.cl-val {
+  font-family:'Outfit'; font-size:32px; font-weight:300;
+  color:var(--white); line-height:1; margin-bottom:4px;
+}
+.cl-val.negative { color:var(--red); }
+.cl-of-row {
+  display:flex; align-items:center; gap:8px; margin-bottom:12px;
+}
 .cl-of { font-size:10px; color:var(--dim); }
-.cl-pct { font-size:10px; font-weight:600; }
-.cl-track { height:1px; background:rgba(255,255,255,0.06); position:relative; overflow:visible; }
-.cl-fill { height:100%; position:absolute; top:0; left:0; width:0%; transition: width 1.2s cubic-bezier(0.25,0.46,0.45,0.94); }
+.cl-pct { font-size:10px; font-weight:700; }
+.cl-pct.senior { color:var(--senior); }
+.cl-pct.pleno  { color:var(--pleno); }
+.cl-pct.junior { color:var(--junior); }
+.cl-track {
+  height:3px; background:rgba(255,255,255,0.07);
+  border-radius:2px; position:relative; overflow:hidden;
+}
+.cl-fill {
+  height:100%; position:absolute; top:0; left:0; width:0%;
+  border-radius:2px;
+  transition: width 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+}
 .cl-fill.senior { background:var(--senior); }
 .cl-fill.pleno  { background:var(--pleno); }
 .cl-fill.junior { background:var(--junior); }
 
 /* ── RANKING ── */
+.rank-header {
+  display:grid; grid-template-columns:36px 1fr 110px 180px 56px;
+  gap:12px; padding-bottom:10px;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:2px;
+}
+.rank-header-cell {
+  font-size:8px; font-weight:700; letter-spacing:3px;
+  color:var(--dim); text-transform:uppercase;
+}
+.rank-header-cell.right { text-align:right; }
+
 .rank-row {
-  display:grid; grid-template-columns:28px 1fr auto 160px 52px;
+  display:grid; grid-template-columns:36px 1fr 110px 180px 56px;
   gap:12px; align-items:center;
   padding:10px 0; border-bottom:1px solid var(--border);
-  animation: fadeUp 0.4s ease both;
+  animation: fadeUp 0.35s ease both;
 }
 .rank-row:last-child { border-bottom:none; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
 .rn {
-  font-family:'DM Mono'; font-size:10px; font-weight:400;
-  color:var(--dim); text-align:center; width:28px;
+  font-family:'DM Mono'; font-size:11px; font-weight:400;
+  color:var(--dim); text-align:center;
 }
-.rn.top { font-size:14px; color:var(--white); }
-.ra-name { font-family: 'DM Sans', sans-serif; font-size:13px; font-weight:400; color:var(--white); letter-spacing:0.2px; }
+.rn.top { font-size:15px; }
+
+.ra-name {
+  font-family:'DM Sans', sans-serif; font-size:13px;
+  font-weight:400; color:var(--white);
+}
 .ra-tag {
   display:inline-block; margin-top:3px;
   font-size:7px; font-weight:700; letter-spacing:3px;
   text-transform:uppercase; padding:2px 6px;
 }
-.ra-tag.senior { color:var(--senior); background:rgba(226,201,126,0.08); }
-.ra-tag.pleno  { color:var(--pleno);  background:rgba(168,197,218,0.08); }
-.ra-tag.junior { color:var(--junior); background:rgba(195,176,214,0.08); }
+.ra-tag.senior { color:var(--senior); background:rgba(226,201,126,0.1); }
+.ra-tag.pleno  { color:var(--pleno);  background:rgba(168,197,218,0.1); }
+.ra-tag.junior { color:var(--junior); background:rgba(195,176,214,0.1); }
 
 .rv {
-  font-family:'Outfit'; font-size:18px; font-weight:300;
+  font-family:'Outfit'; font-size:17px; font-weight:300;
   color:var(--white); text-align:right; white-space:nowrap;
 }
 .rv.negative { color:var(--red); }
 
-.rb { display:flex; flex-direction:column; gap:4px; }
-.mini-track { height:1px; background:rgba(255,255,255,0.06); position:relative; }
-.mini-fill { position:absolute; top:0; left:0; height:100%; width:0%; transition:width 1.2s cubic-bezier(0.25,0.46,0.45,0.94); }
+/* vs meta col: bar + meta label */
+.rb { display:flex; flex-direction:column; gap:5px; }
+.mini-track {
+  height:3px; background:rgba(255,255,255,0.07);
+  border-radius:2px; position:relative; overflow:hidden;
+}
+.mini-fill {
+  position:absolute; top:0; left:0; height:100%; width:0%;
+  border-radius:2px;
+  transition:width 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+}
 .mini-fill.senior { background:var(--senior); }
 .mini-fill.pleno  { background:var(--pleno); }
 .mini-fill.junior { background:var(--junior); }
-.rb-meta { font-size:9px; color:var(--dim); text-align:right; }
+.rb-meta {
+  font-family:'DM Mono'; font-size:9px; color:var(--dim); text-align:right;
+}
 
 .rp {
-  font-family:'DM Mono'; font-size:11px; font-weight:400;
+  font-family:'DM Mono'; font-size:12px; font-weight:400;
   text-align:right;
 }
 
@@ -530,10 +578,7 @@ body::before {
 
     <!-- LEFT: CLUSTERS -->
     <div class="panel">
-      <div class="section-head">
-        <div class="section-title">Por Cluster</div>
-        <div class="section-badge">3 níveis</div>
-      </div>
+      <div class="panel-label">Por Cluster</div>
       <div id="cluster-list">
         <div style="color:var(--dim);font-size:11px;padding:20px 0">Carregando...</div>
       </div>
@@ -541,9 +586,16 @@ body::before {
 
     <!-- RIGHT: RANKING -->
     <div class="panel">
-      <div class="section-head">
-        <div class="section-title">Ranking de Captação</div>
-        <div class="section-badge" id="ranking-badge">— assessores</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="panel-label" style="margin-bottom:0">Ranking de Captação — Assessores</div>
+        <div class="section-badge" id="ranking-badge">—</div>
+      </div>
+      <div class="rank-header">
+        <div class="rank-header-cell">#</div>
+        <div class="rank-header-cell">Assessor</div>
+        <div class="rank-header-cell right">Captação</div>
+        <div class="rank-header-cell right">VS Meta</div>
+        <div class="rank-header-cell right">%</div>
       </div>
       <div id="ranking-list">
         <div style="color:var(--dim);font-size:11px;padding:20px 0">Carregando...</div>
@@ -765,54 +817,53 @@ function renderDashboard(assessores,metaTotal){
     badgeEl.className='status-badge badge-red'; badgeEl.textContent='Atenção';
   }
 
-  // Clusters
+  // Clusters — cards
   const clusters={senior:{cap:0,meta:0,count:0},pleno:{cap:0,meta:0,count:0},junior:{cap:0,meta:0,count:0}};
   for(const a of assessores){
     const k=a.nivelKey;
     if(clusters[k]){clusters[k].cap+=a.cap;clusters[k].meta+=a.meta;clusters[k].count++;}
   }
+  const metaIndLabel = {senior:'R$ 2M cada',pleno:'R$ 1,5M cada',junior:'R$ 1M cada'};
   const clHTML=['senior','pleno','junior'].map(k=>{
     const c=clusters[k];
-    const p=c.meta>0?Math.min(c.cap/c.meta*100,100):0;
-    const pctStr=(c.meta>0?(c.cap/c.meta*100).toFixed(0):'0')+'%';
+    const p=c.meta>0?c.cap/c.meta*100:0;
+    const barW=Math.max(Math.min(p,100),0);
+    const pctStr=(c.meta>0?p.toFixed(0):'0')+'%';
     const label=k==='senior'?'Sênior':k==='pleno'?'Pleno':'Júnior';
-    const capColor=c.cap<0?'style="color:var(--red)"':'';
-    return `<div class="cluster-item">
-      <div class="cl-header">
-        <div class="cl-name ${k}">${label} · ${c.count} assessores</div>
-        <div class="cl-val" ${capColor}>${fmt(c.cap)}</div>
-      </div>
-      <div class="cl-meta-row">
-        <div class="cl-of">Meta total: ${fmt(c.meta)}</div>
-        <div class="cl-pct" style="color:var(--${k})">${pctStr}</div>
+    return `<div class="cluster-card">
+      <div class="cl-name ${k}">${label}</div>
+      <div class="cl-sub">${c.count} assessores · Meta: ${metaIndLabel[k]} → ${fmt(c.meta)} total</div>
+      <div class="cl-val ${c.cap<0?'negative':''}">${fmt(c.cap)}</div>
+      <div class="cl-of-row">
+        <div class="cl-of">de ${fmt(c.meta)}</div>
+        <div class="cl-pct ${k}">· ${pctStr}</div>
       </div>
       <div class="cl-track">
-        <div class="cl-fill ${k}" data-w="${Math.min(p,100)}"></div>
+        <div class="cl-fill ${k}" data-w="${barW}"></div>
       </div>
     </div>`;
   }).join('');
   document.getElementById('cluster-list').innerHTML=clHTML;
 
-  // Ranking
+  // Ranking — colunas
   const sorted=[...assessores].sort((a,b)=>b.cap-a.cap);
   const maxCap=Math.max(...sorted.map(a=>Math.abs(a.cap)),1);
-  document.getElementById('ranking-badge').textContent=sorted.length+' assessores';
+  document.getElementById('ranking-badge').textContent='Mês Atual';
 
   const medals=['🥇','🥈','🥉'];
   const rankHTML=sorted.map((a,i)=>{
     const p=a.meta>0?a.cap/a.meta*100:0;
-    const barW=Math.min(Math.abs(a.cap)/maxCap*100,100);
+    const barW=Math.max(Math.min(Math.abs(a.cap)/maxCap*100,100),0);
     const pctColor=p>=100?'var(--green)':p>=50?'var(--gold)':'var(--red)';
     const k=a.nivelKey;
-    const medal=i<3?medals[i]:String(i+1).padStart(2,'0');
-    const isNeg=a.cap<0;
+    const num=i<3?medals[i]:String(i+1).padStart(2,'0');
     return `<div class="rank-row" style="animation-delay:${i*0.04}s">
-      <div class="rn ${i<3?'top':''}">${medal}</div>
+      <div class="rn ${i<3?'top':''}">${num}</div>
       <div>
         <div class="ra-name">${a.nome}</div>
         <span class="ra-tag ${k}">${a.nivelLabel}</span>
       </div>
-      <div class="rv ${isNeg?'negative':''}">${fmt(a.cap)}</div>
+      <div class="rv ${a.cap<0?'negative':''}">${fmt(a.cap)}</div>
       <div class="rb">
         <div class="mini-track"><div class="mini-fill ${k}" data-w="${barW}"></div></div>
         <div class="rb-meta">${fmt(a.meta)}</div>
