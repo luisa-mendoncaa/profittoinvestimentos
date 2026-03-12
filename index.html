@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profitto Growth — Painel Operacional</title>
-<link href="https://docs.google.com/spreadsheets/d/e/2PACX-1vSKSZ1Iirp6Cy_jC_FVnUBokzHdOiHxgJcXkTbT5773Ty4NSffCbuo87wxUOCRqkA/pub?gid=309056838&single=true&output=csv">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
   --black: #011a2a;
@@ -82,7 +82,52 @@ html, body {
 .body {
   display: grid;
   grid-template-columns: 300px 1fr;
+  grid-template-rows: auto 1fr;
   overflow: hidden;
+}
+
+/* ── KPI CARDS ROW (full width, topo) ── */
+.kpi-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--border);
+  background: var(--black);
+  flex-shrink: 0;
+}
+.kpi-card {
+  padding: 14px 18px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 5px;
+}
+.kpi-card:last-child { border-right: none; }
+.kpi-card-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 3px;
+  color: var(--dim); text-transform: uppercase;
+}
+.kpi-card-val {
+  font-family: 'Outfit'; font-size: 26px; font-weight: 300;
+  line-height: 1; color: var(--white);
+}
+.kpi-card-val.neg  { color: var(--red); }
+.kpi-card-val.warn { color: var(--gold); }
+.kpi-card-val.good { color: var(--green); }
+.kpi-card-sub {
+  font-size: 9px; font-weight: 500; letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 5px;
+}
+.kpi-card-sub.neg  { color: var(--red); }
+.kpi-card-sub.warn { color: var(--gold); }
+.kpi-card-sub.good { color: var(--green); }
+.kpi-card-sub.dim  { color: var(--dim); }
+.kpi-card-bar {
+  height: 2px; background: rgba(255,255,255,0.07);
+  border-radius: 1px; position: relative; overflow: hidden; margin-top: 2px;
+}
+.kpi-card-bar-fill {
+  position: absolute; top:0; left:0; height:100%; width:0%;
+  border-radius:1px; background:var(--gold);
+  transition: width 1.2s ease;
 }
 
 /* ── LEFT PANEL ── */
@@ -91,46 +136,6 @@ html, body {
   display: flex; flex-direction: column;
   overflow: hidden;
 }
-
-/* progress strip */
-.progress-strip {
-  padding: 14px 18px 12px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(0,0,0,0.15);
-}
-.ps-title { font-size:8px; font-weight:700; letter-spacing:3px; color:var(--dim); text-transform:uppercase; margin-bottom:10px; }
-.ps-numbers { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-.ps-num-block {}
-.ps-label { font-size:7px; font-weight:600; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-bottom:2px; }
-.ps-val { font-family:'Outfit'; font-size:20px; font-weight:300; line-height:1; color:var(--white); }
-.ps-val.negative { color:var(--red); }
-.ps-val.sm { font-size:15px; }
-
-.ps-track { position:relative; height:4px; background:rgba(255,255,255,0.07); border-radius:2px; margin-bottom:4px; }
-.ps-track-ideal { position:absolute; top:0; left:0; height:100%; background:rgba(212,175,106,0.3); border-radius:2px; transition:width 1.2s ease; }
-.ps-track-fill  { position:absolute; top:0; left:0; height:100%; background:var(--white); border-radius:2px; width:0%; transition:width 1.2s ease; }
-.ps-track-fill.neg { background:var(--red); width:3px !important; }
-.ps-marker { position:absolute; top:-4px; width:2px; height:12px; background:var(--gold); transition:left 1.2s ease; }
-
-.ps-stats { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px; }
-.ps-stat-label { font-size:7px; font-weight:600; letter-spacing:2px; color:var(--dim); text-transform:uppercase; margin-bottom:1px; }
-.ps-stat-val { font-family:'DM Mono'; font-size:11px; font-weight:400; }
-.ps-stat-val.bad  { color:var(--red); }
-.ps-stat-val.good { color:var(--green); }
-.ps-stat-val.warn { color:var(--gold); }
-
-/* dias strip */
-.dias-strip {
-  display:grid; grid-template-columns:1fr 1fr 1fr;
-  border-bottom: 1px solid var(--border);
-}
-.dia-item {
-  padding:8px 14px; border-right:1px solid var(--border);
-  display:flex; flex-direction:column; gap:2px;
-}
-.dia-item:last-child { border-right:none; }
-.dia-label { font-size:7px; font-weight:600; letter-spacing:2px; color:var(--dim); text-transform:uppercase; }
-.dia-val { font-family:'Outfit'; font-size:18px; font-weight:300; color:var(--white); }
 
 /* clusters */
 .clusters { flex:1; overflow-y:auto; padding:12px 18px; display:flex; flex-direction:column; gap:10px; }
@@ -337,62 +342,38 @@ html, body {
   <!-- BODY -->
   <div class="body">
 
+    <!-- KPI ROW: full width -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-card-label">Captação Total</div>
+        <div class="kpi-card-val" id="kpi-total">—</div>
+        <div class="kpi-card-sub dim" id="kpi-total-sub">—</div>
+        <div class="kpi-card-bar"><div class="kpi-card-bar-fill" id="kpi-total-bar"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label">Meta Total</div>
+        <div class="kpi-card-val" id="kpi-meta">—</div>
+        <div class="kpi-card-sub dim" id="kpi-meta-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label">Faltam</div>
+        <div class="kpi-card-val" id="kpi-falta">—</div>
+        <div class="kpi-card-sub dim" id="kpi-falta-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label">Ritmo Diário</div>
+        <div class="kpi-card-val" id="kpi-ritmo">—</div>
+        <div class="kpi-card-sub dim">Necessário para bater meta</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-label">Projeção Mês</div>
+        <div class="kpi-card-val" id="kpi-proj">—</div>
+        <div class="kpi-card-sub dim" id="kpi-proj-sub">—</div>
+      </div>
+    </div>
+
     <!-- LEFT -->
     <div class="left">
-
-      <!-- PROGRESSO -->
-      <div class="progress-strip">
-        <div class="ps-title">Progresso — Março 2026</div>
-        <div class="ps-numbers">
-          <div class="ps-num-block">
-            <div class="ps-label">Captado</div>
-            <div class="ps-val negative" id="ps-captado">—</div>
-          </div>
-          <div class="ps-num-block">
-            <div class="ps-label">Meta total</div>
-            <div class="ps-val sm" id="ps-meta">—</div>
-          </div>
-        </div>
-        <div class="ps-track">
-          <div class="ps-track-ideal" id="ps-ideal-track"></div>
-          <div class="ps-track-fill"  id="ps-fill"></div>
-          <div class="ps-marker"      id="ps-marker" style="left:0%"></div>
-        </div>
-        <div class="ps-stats">
-          <div>
-            <div class="ps-stat-label">Atingido</div>
-            <div class="ps-stat-val bad" id="ps-pct">—</div>
-          </div>
-          <div>
-            <div class="ps-stat-label">Ideal hoje</div>
-            <div class="ps-stat-val warn" id="ps-ideal-pct">—</div>
-          </div>
-          <div>
-            <div class="ps-stat-label">Defasagem</div>
-            <div class="ps-stat-val bad" id="ps-gap">—</div>
-          </div>
-          <div>
-            <div class="ps-stat-label">Ritmo / dia</div>
-            <div class="ps-stat-val" id="ps-ritmo">—</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DIAS -->
-      <div class="dias-strip">
-        <div class="dia-item">
-          <div class="dia-label">Passados</div>
-          <div class="dia-val" id="dias-passados">—</div>
-        </div>
-        <div class="dia-item">
-          <div class="dia-label">Restantes</div>
-          <div class="dia-val" id="dias-restantes">—</div>
-        </div>
-        <div class="dia-item">
-          <div class="dia-label">Atualizado</div>
-          <div class="dia-val" id="last-update" style="font-size:12px;padding-top:3px">—</div>
-        </div>
-      </div>
 
       <!-- FILIAIS -->
       <div class="clusters" id="cluster-list">
@@ -538,33 +519,35 @@ function renderDashboard(assessores,metaTotal){
   const pctIdeal=DIAS_UTEIS_PASSADOS/DIAS_UTEIS_MES;
   const idealVal=metaTotal*pctIdeal;
   const defasagem=idealVal-capTotal;
+  const proj=diasRest>0?(capTotal/DIAS_UTEIS_PASSADOS)*DIAS_UTEIS_MES:capTotal;
 
-  // Dias
-  document.getElementById('dias-passados').textContent=DIAS_UTEIS_PASSADOS;
-  document.getElementById('dias-restantes').textContent=diasRest;
-  document.getElementById('last-update').textContent=new Date().toLocaleTimeString('pt-BR');
+  // KPI cards
+  const kpiTotal=document.getElementById('kpi-total');
+  kpiTotal.textContent=fmt(capTotal);
+  kpiTotal.className='kpi-card-val '+(capTotal<0?'neg':capTotal>=metaTotal?'good':'');
+  const pctStr=(pctTotal*100).toFixed(1)+'%';
+  const kpiTotalSub=document.getElementById('kpi-total-sub');
+  kpiTotalSub.textContent=pctStr+' da meta mensal';
+  kpiTotalSub.className='kpi-card-sub '+(pctTotal>=pctIdeal?'good':'neg');
+  setTimeout(()=>{ document.getElementById('kpi-total-bar').style.width=Math.min(pctTotal*100,100)+'%'; },400);
 
-  // Progresso
-  const capEl=document.getElementById('ps-captado');
-  capEl.textContent=fmt(capTotal);
-  capEl.className='ps-val '+(capTotal<0?'negative':'');
-  document.getElementById('ps-meta').textContent=fmt(metaTotal);
+  document.getElementById('kpi-meta').textContent=fmt(metaTotal);
+  document.getElementById('kpi-meta-sub').textContent=assessores.length+' assessores · 3 filiais';
 
-  document.getElementById('ps-pct').textContent=(pctTotal*100).toFixed(1)+'%';
-  document.getElementById('ps-pct').className='ps-stat-val '+(pctTotal>=pctIdeal?'good':'bad');
-  document.getElementById('ps-ideal-pct').textContent=(pctIdeal*100).toFixed(1)+'%';
-  document.getElementById('ps-gap').textContent=defasagem>0?'-'+fmt(defasagem):'✓ no ritmo';
-  document.getElementById('ps-gap').className='ps-stat-val '+(defasagem>0?'bad':'good');
-  document.getElementById('ps-ritmo').textContent=fmt(ritmo)+'/dia';
+  const kpiFalta=document.getElementById('kpi-falta');
+  kpiFalta.textContent=fmt(falta);
+  kpiFalta.className='kpi-card-val '+(falta===0?'good':'warn');
+  document.getElementById('kpi-falta-sub').textContent=diasRest+' dias úteis restantes';
 
-  setTimeout(()=>{
-    const idealPct=Math.min(pctIdeal*100,100);
-    document.getElementById('ps-ideal-track').style.width=idealPct+'%';
-    document.getElementById('ps-marker').style.left=idealPct+'%';
-    const fill=document.getElementById('ps-fill');
-    if(capTotal<=0){ fill.className='ps-track-fill neg'; }
-    else { fill.className='ps-track-fill'; fill.style.width=Math.min(pctTotal*100,100)+'%'; }
-  },400);
+  document.getElementById('kpi-ritmo').textContent=fmt(ritmo);
+
+  const kpiProj=document.getElementById('kpi-proj');
+  kpiProj.textContent=fmt(proj);
+  kpiProj.className='kpi-card-val '+(proj>=metaTotal?'good':proj<0?'neg':'warn');
+  const projPct=(proj/metaTotal*100).toFixed(1)+'%';
+  const kpiProjSub=document.getElementById('kpi-proj-sub');
+  kpiProjSub.textContent='▲ '+projPct+' da meta';
+  kpiProjSub.className='kpi-card-sub '+(proj>=metaTotal?'good':'warn');
 
   // Filiais
   const fil={
