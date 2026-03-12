@@ -476,15 +476,28 @@ function updateClock(){
 updateClock(); setInterval(updateClock,1000);
 
 async function loadData(){
-  try{
-    const res=await fetch('https://corsproxy.io/?'+encodeURIComponent(SHEET_URL));
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    processData(parseCSV(await res.text()));
-  }catch(e){
-    console.error(e);
-    document.getElementById('error-banner').classList.add('show');
-    document.getElementById('loading').classList.add('hidden');
+  const proxies = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://cors-anywhere.herokuapp.com/',
+  ];
+  let lastErr;
+  for(const proxy of proxies){
+    try{
+      const res=await fetch(proxy+encodeURIComponent(SHEET_URL));
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const text=await res.text();
+      if(!text||text.trim().length<10) throw new Error('Empty response');
+      processData(parseCSV(text));
+      return;
+    }catch(e){
+      lastErr=e;
+      console.warn('Proxy falhou:',proxy,e.message);
+    }
   }
+  console.error('Todos os proxies falharam:',lastErr);
+  document.getElementById('error-banner').classList.add('show');
+  document.getElementById('loading').classList.add('hidden');
 }
 
 function processData(rows){
