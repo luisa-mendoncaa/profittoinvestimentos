@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -224,7 +224,7 @@ html, body {
 .rank-badge { font-size:8px; font-weight:600; letter-spacing:2px; color:var(--dim); border:1px solid var(--border); padding:3px 8px; text-transform:uppercase; }
 
 .rank-header {
-  display:grid; grid-template-columns:32px 220px 110px 160px 52px;
+  display:grid; grid-template-columns:32px 220px 110px 160px 52px 58px;
   gap:10px; padding-bottom:8px;
   border-bottom:1px solid var(--border2);
   flex-shrink:0;
@@ -269,7 +269,7 @@ html, body {
 .nb-fill.junior { background:var(--junior); }
 
 .rank-row {
-  display:grid; grid-template-columns:32px 220px 110px 160px 52px;
+  display:grid; grid-template-columns:32px 220px 110px 160px 52px 58px;
   gap:10px; align-items:center;
   padding:7px 0; border-bottom:1px solid var(--border);
   animation:fadeUp 0.3s ease both;
@@ -301,6 +301,9 @@ html, body {
 .rb-meta { font-family:'DM Mono'; font-size:8px; color:var(--dim); text-align:right; }
 
 .rp { font-family:'DM Mono'; font-size:11px; text-align:right; }
+.rr { font-family:'DM Mono'; font-size:11px; text-align:right; color:var(--dim); }
+.rr.roa-ok  { color:var(--green); }
+.rr.roa-dim { color:var(--dim); }
 
 /* ── LAST UPDATE + COUNTDOWN ── */
 .update-info {
@@ -442,6 +445,7 @@ html, body {
         <div class="rh r sortable active" id="sort-cap" onclick="toggleSort('cap')">Captação <span class="sort-arrow">▼</span></div>
         <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">VS Meta <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
+        <div class="rh r">ROA</div>
       </div>
       <div class="rank-list" id="ranking-list">
         <div style="color:var(--dim);font-size:11px;padding:12px 0">Carregando...</div>
@@ -650,7 +654,8 @@ function processData(rows){
     const metaFinal=meta||METAS[nome]||0;
     const nivelKey=NIVEIS[nome]||'junior';
     const filialKey=FILIAIS[nome]||'matriz';
-    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],filialKey,cap,meta:metaFinal});
+    const roa=row[9]?row[9].trim():'';
+    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],filialKey,cap,meta:metaFinal,roa});
     metaTotal+=metaFinal;
   }
   if(!assessores.length){
@@ -678,6 +683,10 @@ function renderRanking(assessores){
     const k=a.nivelKey;
     const metaOk=p>=100;
     const vsMeta=a.cap-a.meta;
+    // ROA: parse para comparar com 0.35%
+    const roaStr=a.roa||'—';
+    const roaNum=parseFloat(roaStr.replace('%','').replace(',','.'))||0;
+    const roaCls=a.roa?(roaNum>=0.35?'roa-ok':'roa-dim'):'roa-dim';
     return `<div class="rank-row${metaOk?' meta-ok':''}" style="animation-delay:${i*0.03}s">
       <div class="rn ${i<3?'top':''}">${i<3?medals[i]:String(i+1).padStart(2,'0')}</div>
       <div><div class="ra-name">${a.nome}</div><span class="ra-tag ${k}">${a.nivelLabel}</span></div>
@@ -687,6 +696,7 @@ function renderRanking(assessores){
         <div class="rb-meta" style="color:${vsMeta>=0?'var(--green)':'var(--red)'}">${vsMeta>=0?'▲':'▼'} ${fmt(Math.abs(vsMeta))}</div>
       </div>
       <div class="rp" style="color:${pc}">${p.toFixed(0)}%</div>
+      <div class="rr ${roaCls}">${roaStr}</div>
     </div>`;
   }).join('');
 
