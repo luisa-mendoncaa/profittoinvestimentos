@@ -472,8 +472,8 @@ html, body {
         <div class="rh r sortable active" id="sort-cap" onclick="toggleSort('cap')">Captação <span class="sort-arrow">▼</span></div>
         <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">Falta/Sobra <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
-        <div class="rh r">ROA</div>
-        <div class="rh r" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center">
+        <div class="rh r sortable" id="sort-roa" onclick="toggleSort('roa')">ROA <span class="sort-arrow">↕</span></div>
+        <div class="rh r sortable" id="sort-l1" onclick="toggleSort('l1')" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center;cursor:pointer">
           <span>L1</span><span>R1</span><span>R2</span><span>R3</span>
         </div>
       </div>
@@ -628,7 +628,7 @@ function toggleSort(key){
   if(sortKey===key){ sortDesc=!sortDesc; }
   else { sortKey=key; sortDesc=true; }
   // update headers
-  ['cap','vs','pct'].forEach(k=>{
+  ['cap','vs','pct','roa','l1'].forEach(k=>{
     const el=document.getElementById('sort-'+k);
     if(!el) return;
     const arrow=el.querySelector('.sort-arrow');
@@ -708,6 +708,8 @@ function renderRanking(assessores){
   if(sortKey==='cap')  sorted.sort((a,b)=>sortDesc?b.cap-a.cap:a.cap-b.cap);
   if(sortKey==='pct')  sorted.sort((a,b)=>{ const pa=a.meta>0?a.cap/a.meta:0; const pb=b.meta>0?b.cap/b.meta:0; return sortDesc?pb-pa:pa-pb; });
   if(sortKey==='vs')   sorted.sort((a,b)=>{ const va=a.cap-a.meta; const vb=b.cap-b.meta; return sortDesc?vb-va:va-vb; });
+  if(sortKey==='roa')  sorted.sort((a,b)=>{ const ra=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0; const rb=parseFloat((b.roa||'0').replace('%','').replace(',','.'))||0; return sortDesc?rb-ra:ra-rb; });
+  if(sortKey==='l1')   sorted.sort((a,b)=>sortDesc?(b.l1+b.r1+b.r2+b.r3)-(a.l1+a.r1+a.r2+a.r3):(a.l1+a.r1+a.r2+a.r3)-(b.l1+b.r1+b.r2+b.r3));
 
   const maxCap=Math.max(...sorted.map(a=>Math.abs(a.cap)),1);
   const medals=['🥇','🥈','🥉'];
