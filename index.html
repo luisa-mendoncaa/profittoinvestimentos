@@ -142,7 +142,29 @@ html, body {
   transition: width 1.2s ease;
 }
 
-/* ── LEFT PANEL ── */
+/* ── SIDE RANKINGS ── */
+.side-card {
+  border:1px solid var(--border); padding:12px 14px;
+  background:rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:8px;
+}
+.side-card-title {
+  font-size:8px; font-weight:700; letter-spacing:3px;
+  text-transform:uppercase; color:var(--dim); margin-bottom:2px;
+}
+.side-row {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.side-pos {
+  font-family:'DM Mono'; font-size:10px; color:var(--dim); min-width:18px;
+}
+.side-name {
+  font-family:'DM Sans'; font-size:12px; flex:1;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.side-val {
+  font-family:'DM Mono'; font-size:12px; font-weight:600; color:var(--gold);
+}
+.side-val.green { color:var(--green); }
 .left {
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
@@ -462,10 +484,17 @@ html, body {
       </div>
     </div>
 
-    <!-- LEFT: agora mostra Torres/Blumenau -->
+    <!-- LEFT: Top Intensidade + Top ROA -->
     <div class="left">
       <div class="clusters" id="cluster-list">
-        <div style="color:var(--dim);font-size:11px;padding:10px 0">Carregando...</div>
+        <div class="side-card">
+          <div class="side-card-title">⚡ Top Intensidade</div>
+          <div id="top-intensidade"></div>
+        </div>
+        <div class="side-card">
+          <div class="side-card-title">💰 Top ROA</div>
+          <div id="top-roa"></div>
+        </div>
       </div>
     </div>
 
@@ -861,41 +890,48 @@ function renderDashboard(assessores,metaTotal){
 
   renderKPIs(assessores);
 
-  // Filiais — painel esquerdo mostra só Torres e Blumenau
-  const fil={
-    matriz:  {cap:0,meta:0,aais:[]},
-    torres:  {cap:0,meta:0,aais:[]},
-    blumenau:{cap:0,meta:0,aais:[]},
-  };
-  for(const a of assessores){
-    const f=fil[a.filialKey];
-    if(f){ f.cap+=a.cap; f.meta+=a.meta; f.aais.push(a); }
-  }
-  document.getElementById('cluster-list').innerHTML=['torres','blumenau'].map(k=>{
-    const f=fil[k]; const p=f.meta>0?f.cap/f.meta*100:0;
-    const barW=Math.max(Math.min(p,100),0);
-    const aaiTags=f.aais
-      .sort((a,b)=>b.cap-a.cap)
-      .map(a=>`<span class="cl-aai-tag ${a.cap<0?'neg':''}">${a.nome.split(' ')[0]} ${a.cap<0?'▼':'▲'} ${fmt(a.cap)}</span>`)
-      .join('');
-    return `<div class="cluster-card">
-      <div class="cl-name ${k}">${FILIAL_LABEL[k]}</div>
-      <div class="cl-sub">${f.aais.length} assessores · Meta: ${fmt(f.meta)}</div>
-      <div class="cl-row">
-        <div class="cl-val ${f.cap<0?'negative':''}">${fmt(f.cap)}</div>
-        <div class="cl-pct ${k}">${p.toFixed(0)}%</div>
-      </div>
-      <div class="cl-track"><div class="cl-fill ${k}" data-w="${barW}"></div></div>
-      <div class="cl-aais">${aaiTags}</div>
+  // Top Intensidade (soma L1+R1+R2+R3)
+  const medals3=['🥇','🥈','🥉'];
+  const topInt=[...assessores]
+    .sort((a,b)=>(b.l1+b.r1+b.r2+b.r3)-(a.l1+a.r1+a.r2+a.r3))
+    .slice(0,3);
+  document.getElementById('top-intensidade').innerHTML=topInt.map((a,i)=>{
+    const total=a.l1+a.r1+a.r2+a.r3;
+    const primeiroNome=a.nome.split(' ')[0];
+    return `<div class="side-row">
+      <span class="side-pos">${medals3[i]}</span>
+      <span class="side-name">${primeiroNome}</span>
+      <span class="side-val">${total} ativ.</span>
+    </div>
+    <div style="font-size:9px;color:var(--dim);padding-left:26px;margin-top:-4px">
+      L1:${a.l1} · R1:${a.r1} · R2:${a.r2} · R3:${a.r3}
+    </div>`;
+  }).join('');
+
+  // Top ROA
+  const topRoa=[...assessores]
+    .filter(a=>a.roa&&a.roa!=='—')
+    .sort((a,b)=>{
+      const ra=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0;
+      const rb=parseFloat((b.roa||'0').replace('%','').replace(',','.'))||0;
+      return rb-ra;
+    })
+    .slice(0,3);
+  document.getElementById('top-roa').innerHTML=topRoa.map((a,i)=>{
+    const roaNum=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0;
+    const primeiroNome=a.nome.split(' ')[0];
+    return `<div class="side-row">
+      <span class="side-pos">${medals3[i]}</span>
+      <span class="side-name">${primeiroNome}</span>
+      <span class="side-val${roaNum>=0.35?' green':''}">${a.roa}</span>
     </div>`;
   }).join('');
 
   document.getElementById('ranking-badge').textContent='Mês Atual';
   renderRanking(assessores);
 
-  // Animar barras filiais/níveis
   setTimeout(()=>{
-    document.querySelectorAll('.cl-fill[data-w], .nb-fill[data-w], #kpi-total-bar').forEach(el=>{
+    document.querySelectorAll('.nb-fill[data-w], #kpi-total-bar').forEach(el=>{
       el.style.transition='width 1.2s ease';
       const w=el.getAttribute('data-w');
       if(w) el.style.width=w+'%';
