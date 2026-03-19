@@ -33,7 +33,7 @@ html, body {
   font-family:'Outfit', sans-serif;
   background: var(--black);
   color: var(--white);
-  font-size: 13px;
+  font-size: 15px;
 }
 
 /* ── LOADING ── */
@@ -75,7 +75,7 @@ html, body {
 .header-right { display:flex; align-items:center; gap:20px; }
 .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2.5s ease-in-out infinite; display:inline-block; margin-right:6px; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
-.clock { font-family:'DM Mono'; font-size:11px; color:var(--dim); }
+.clock { font-family:'DM Mono'; font-size:13px; color:var(--dim); }
 .live-label { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--green); text-transform:uppercase; }
 
 /* ── BODY: 2 colunas ── */
@@ -106,7 +106,7 @@ html, body {
   color: var(--dim); text-transform: uppercase;
 }
 .kpi-card-val {
-  font-family: 'Outfit'; font-size: 26px; font-weight: 300;
+  font-family: 'Outfit'; font-size: 30px; font-weight: 300;
   line-height: 1; color: var(--white);
 }
 .kpi-card-val.neg  { color: var(--red); }
@@ -152,7 +152,7 @@ html, body {
 .cl-name.blumenau { color:var(--blumenau); }
 .cl-sub { font-size:9px; color:var(--dim); margin-bottom:8px; }
 .cl-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px; }
-.cl-val { font-family:'Outfit'; font-size:24px; font-weight:300; line-height:1; }
+.cl-val { font-family:'Outfit'; font-size:26px; font-weight:300; line-height:1; }
 .cl-val.negative { color:var(--red); }
 .cl-pct { font-size:11px; font-weight:600; }
 .cl-pct.senior { color:var(--senior); }
@@ -278,10 +278,10 @@ html, body {
 .rank-row:last-child { border-bottom:none; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:none} }
 
-.rn { font-family:'DM Mono'; font-size:10px; color:var(--dim); text-align:center; }
-.rn.top { font-size:13px; color:var(--white); }
+.rn { font-family:'DM Mono'; font-size:11px; color:var(--dim); text-align:center; }
+.rn.top { font-size:15px; color:var(--white); }
 
-.ra-name { font-family:'DM Sans'; font-size:12px; font-weight:400; color:var(--white); }
+.ra-name { font-family:'DM Sans'; font-size:14px; font-weight:400; color:var(--white); }
 .ra-tag  {
   display:inline-block; margin-top:2px;
   font-size:7px; font-weight:700; letter-spacing:3px; text-transform:uppercase; padding:1px 5px;
@@ -290,7 +290,7 @@ html, body {
 .ra-tag.pleno  { color:var(--pleno);  background:rgba(168,197,218,0.1); }
 .ra-tag.junior { color:var(--junior); background:rgba(195,176,214,0.1); }
 
-.rv { font-family:'Outfit'; font-size:15px; font-weight:300; text-align:right; white-space:nowrap; }
+.rv { font-family:'Outfit'; font-size:17px; font-weight:300; text-align:right; white-space:nowrap; }
 .rv.neg { color:var(--red); }
 
 .rb { display:flex; flex-direction:column; gap:3px; }
@@ -301,8 +301,8 @@ html, body {
 .mini-fill.junior { background:var(--junior); }
 .rb-meta { font-family:'DM Mono'; font-size:8px; color:var(--dim); text-align:right; }
 
-.rp { font-family:'DM Mono'; font-size:11px; text-align:right; }
-.rr { font-family:'DM Mono'; font-size:11px; text-align:right; color:var(--dim); }
+.rp { font-family:'DM Mono'; font-size:13px; text-align:right; }
+.rr { font-family:'DM Mono'; font-size:13px; text-align:right; color:var(--dim); }
 .rr.roa-ok  { color:var(--green); }
 .rr.roa-dim { color:var(--dim); }
 
@@ -744,8 +744,26 @@ function renderRanking(assessores){
     </div>`;
   }).join('');
 
+  // Níveis bottom — filtra pela tab ativa
+  const nv={senior:{cap:0,meta:0},pleno:{cap:0,meta:0},junior:{cap:0,meta:0}};
+  for(const a of filtered){ const k=a.nivelKey; if(nv[k]){nv[k].cap+=a.cap;nv[k].meta+=a.meta;} }
+  const nvLabel={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
+  document.getElementById('nivel-bottom').innerHTML=
+    ['senior','pleno','junior'].map(k=>{
+      const n=nv[k]; const p=n.meta>0?Math.max(Math.min(n.cap/n.meta*100,100),0):0;
+      const pctStr=(n.meta>0?(n.cap/n.meta*100).toFixed(0):'0')+'%';
+      return `<div class="nb-card">
+        <div class="nb-label ${k}">${nvLabel[k]}</div>
+        <div class="nb-val ${n.cap<0?'neg':''}">${fmt(n.cap)}</div>
+        <div class="nb-row">
+          <div class="nb-track"><div class="nb-fill ${k}" data-w="${p}"></div></div>
+          <div class="nb-pct ${k}">${pctStr}</div>
+        </div>
+      </div>`;
+    }).join('');
+
   setTimeout(()=>{
-    document.querySelectorAll('.mini-fill[data-w]').forEach(el=>{
+    document.querySelectorAll('.nb-fill[data-w]').forEach(el=>{
       el.style.transition='width 1.2s ease';
       el.style.width=el.getAttribute('data-w')+'%';
     });
@@ -834,24 +852,6 @@ function renderDashboard(assessores,metaTotal){
       <div class="cl-aais">${aaiTags}</div>
     </div>`;
   }).join('');
-
-  // Níveis bottom
-  const nv={senior:{cap:0,meta:0},pleno:{cap:0,meta:0},junior:{cap:0,meta:0}};
-  for(const a of assessores){ const k=a.nivelKey; if(nv[k]){nv[k].cap+=a.cap;nv[k].meta+=a.meta;} }
-  const nvLabel={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
-  document.getElementById('nivel-bottom').innerHTML=
-    ['senior','pleno','junior'].map(k=>{
-      const n=nv[k]; const p=n.meta>0?Math.max(Math.min(n.cap/n.meta*100,100),0):0;
-      const pctStr=(n.meta>0?(n.cap/n.meta*100).toFixed(0):'0')+'%';
-      return `<div class="nb-card">
-        <div class="nb-label ${k}">${nvLabel[k]}</div>
-        <div class="nb-val ${n.cap<0?'neg':''}">${fmt(n.cap)}</div>
-        <div class="nb-row">
-          <div class="nb-track"><div class="nb-fill ${k}" data-w="${p}"></div></div>
-          <div class="nb-pct ${k}">${pctStr}</div>
-        </div>
-      </div>`;
-    }).join('');
 
   document.getElementById('ranking-badge').textContent='Mês Atual';
   renderRanking(assessores);
