@@ -218,13 +218,14 @@ html, body {
 }
 .rank-top {
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:10px; flex-shrink:0;
+  margin-bottom:6px; flex-shrink:0;
 }
 .rank-title { font-size:8px; font-weight:700; letter-spacing:4px; color:var(--dim); text-transform:uppercase; }
 .rank-badge { font-size:8px; font-weight:600; letter-spacing:2px; color:var(--dim); border:1px solid var(--border); padding:3px 8px; text-transform:uppercase; }
 
 .rank-header {
-  display:grid; grid-template-columns:32px 220px 110px 160px 52px 58px;
+  display:grid; grid-template-columns:32px 180px 100px 140px 44px 52px 120px;
+
   gap:10px; padding-bottom:8px;
   border-bottom:1px solid var(--border2);
   flex-shrink:0;
@@ -269,7 +270,7 @@ html, body {
 .nb-fill.junior { background:var(--junior); }
 
 .rank-row {
-  display:grid; grid-template-columns:32px 220px 110px 160px 52px 58px;
+  display:grid; grid-template-columns:32px 180px 100px 140px 44px 52px 120px;
   gap:10px; align-items:center;
   padding:7px 0; border-bottom:1px solid var(--border);
   animation:fadeUp 0.3s ease both;
@@ -304,6 +305,33 @@ html, body {
 .rr { font-family:'DM Mono'; font-size:11px; text-align:right; color:var(--dim); }
 .rr.roa-ok  { color:var(--green); }
 .rr.roa-dim { color:var(--dim); }
+
+/* ── INTENSIDADE ── */
+.ri { display:flex; align-items:center; gap:4px; justify-content:flex-end; }
+.ri-badge {
+  font-family:'DM Mono'; font-size:9px; font-weight:600;
+  padding:2px 5px; border-radius:2px; min-width:22px; text-align:center;
+}
+.ri-badge.l1-0  { background:rgba(248,113,113,0.15); color:var(--red); }
+.ri-badge.l1-ok { background:rgba(74,222,128,0.15);  color:var(--green); }
+.ri-badge.r1-0  { background:rgba(248,113,113,0.15); color:var(--red); }
+.ri-badge.r1-ok { background:rgba(212,175,106,0.15); color:var(--gold); }
+.ri-badge.r2-0  { background:rgba(255,255,255,0.05); color:var(--dim); }
+.ri-badge.r2-ok { background:rgba(168,197,218,0.15); color:var(--pleno); }
+.ri-badge.r3-0  { background:rgba(255,255,255,0.05); color:var(--dim); }
+.ri-badge.r3-ok { background:rgba(195,176,214,0.15); color:var(--junior); }
+
+/* ── TABS PORTO ALEGRE / FILIAIS ── */
+.rank-tabs {
+  display:flex; gap:1px; margin-bottom:10px; flex-shrink:0;
+}
+.rank-tab {
+  font-size:8px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  padding:6px 16px; cursor:pointer; border-bottom:2px solid transparent;
+  color:var(--dim); transition:all 0.2s;
+}
+.rank-tab:hover { color:var(--white); }
+.rank-tab.active { color:var(--white); border-bottom-color:var(--gold); }
 
 /* ── LAST UPDATE + COUNTDOWN ── */
 .update-info {
@@ -419,20 +447,20 @@ html, body {
       </div>
     </div>
 
-    <!-- LEFT -->
+    <!-- LEFT: agora mostra Torres/Blumenau -->
     <div class="left">
-
-      <!-- FILIAIS -->
       <div class="clusters" id="cluster-list">
         <div style="color:var(--dim);font-size:11px;padding:10px 0">Carregando...</div>
       </div>
-
     </div>
 
-    <!-- RIGHT: RANKING -->
+    <!-- RIGHT: RANKING COM TABS -->
     <div class="right">
       <div class="rank-top">
-        <div class="rank-title">Ranking de Captação — Assessores</div>
+        <div style="display:flex;align-items:center;gap:0">
+          <div class="rank-tab active" id="tab-poa" onclick="switchTab('poa')">Porto Alegre</div>
+          <div class="rank-tab" id="tab-filiais" onclick="switchTab('filiais')">Filiais</div>
+        </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span class="dias-badge" id="dias-badge">—</span>
           <div class="rank-badge" id="ranking-badge">—</div>
@@ -445,12 +473,13 @@ html, body {
         <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">VS Meta <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
         <div class="rh r">ROA</div>
+        <div class="rh r">Intensidade</div>
       </div>
       <div class="rank-list" id="ranking-list">
         <div style="color:var(--dim);font-size:11px;padding:12px 0">Carregando...</div>
       </div>
 
-      <!-- NÍVEIS BOTTOM -->
+      <!-- NÍVEIS BOTTOM: agora Torres / Blumenau / Total Filiais -->
       <div class="nivel-bottom" id="nivel-bottom">
         <div class="nb-card"><div class="nb-label senior">Sênior</div><div class="nb-val">—</div></div>
         <div class="nb-card"><div class="nb-label pleno">Pleno</div><div class="nb-val">—</div></div>
@@ -466,7 +495,7 @@ html, body {
 const SHEET_ID  = '1IcGygIIk6TUQBf4Vcx-KOtD2RDK5y0dbAcELr_U6KBs';
 const API_KEY   = 'AIzaSyCu2_6jRfuXwqLC4nj-cpMX36AGeWOvXPE';
 const SHEET_TAB = 'admin_total';
-const SHEET_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_TAB}!A1:J30?key=${API_KEY}`;
+const SHEET_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_TAB}!A1:N30?key=${API_KEY}`;
 
 // ── FERIADOS NACIONAIS + RS 2025 (formato MM-DD) ──
 const FERIADOS = new Set([
@@ -579,6 +608,16 @@ let nextRefreshAt = Date.now() + REFRESH_INTERVAL;
 let sortKey = 'cap'; // 'cap' | 'pct' | 'vs'
 let sortDesc = true;
 let _lastAssessores = [];
+let _activeTab = 'poa'; // 'poa' | 'filiais'
+
+function switchTab(tab){
+  _activeTab = tab;
+  ['poa','filiais'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.classList.toggle('active', t===tab);
+  });
+  if(_lastAssessores.length) renderRanking(_lastAssessores);
+}
 
 function toggleSort(key){
   if(sortKey===key){ sortDesc=!sortDesc; }
@@ -638,7 +677,11 @@ function processData(rows){
     const nivelKey=NIVEIS[nome]||'junior';
     const filialKey=FILIAIS[nome]||'matriz';
     const roa=row[9]?row[9].trim():'';
-    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],filialKey,cap,meta:metaFinal,roa});
+    const l1=parseInt(row[10])||0;
+    const r1=parseInt(row[11])||0;
+    const r2=parseInt(row[12])||0;
+    const r3=parseInt(row[13])||0;
+    assessores.push({nome,nivelKey,nivelLabel:NIVEL_LABEL[nivelKey],filialKey,cap,meta:metaFinal,roa,l1,r1,r2,r3});
     metaTotal+=metaFinal;
   }
   if(!assessores.length){
@@ -651,7 +694,12 @@ function processData(rows){
 }
 
 function renderRanking(assessores){
-  let sorted=[...assessores];
+  // filtrar por tab
+  const filtered = _activeTab === 'poa'
+    ? assessores.filter(a => a.filialKey === 'matriz')
+    : assessores.filter(a => a.filialKey !== 'matriz');
+
+  let sorted=[...filtered];
   if(sortKey==='cap')  sorted.sort((a,b)=>sortDesc?b.cap-a.cap:a.cap-b.cap);
   if(sortKey==='pct')  sorted.sort((a,b)=>{ const pa=a.meta>0?a.cap/a.meta:0; const pb=b.meta>0?b.cap/b.meta:0; return sortDesc?pb-pa:pa-pb; });
   if(sortKey==='vs')   sorted.sort((a,b)=>{ const va=a.cap-a.meta; const vb=b.cap-b.meta; return sortDesc?vb-va:va-vb; });
@@ -666,10 +714,15 @@ function renderRanking(assessores){
     const k=a.nivelKey;
     const metaOk=p>=100;
     const vsMeta=a.cap-a.meta;
-    // ROA: parse para comparar com 0.35%
+    // ROA
     const roaStr=a.roa||'—';
     const roaNum=parseFloat(roaStr.replace('%','').replace(',','.'))||0;
     const roaCls=a.roa?(roaNum>=0.35?'roa-ok':'roa-dim'):'roa-dim';
+    // Intensidade badges
+    const l1cls=a.l1>0?'l1-ok':'l1-0';
+    const r1cls=a.r1>0?'r1-ok':'r1-0';
+    const r2cls=a.r2>0?'r2-ok':'r2-0';
+    const r3cls=a.r3>0?'r3-ok':'r3-0';
     return `<div class="rank-row${metaOk?' meta-ok':''}" style="animation-delay:${i*0.03}s">
       <div class="rn ${i<3?'top':''}">${i<3?medals[i]:String(i+1).padStart(2,'0')}</div>
       <div><div class="ra-name">${a.nome}</div><span class="ra-tag ${k}">${a.nivelLabel}</span></div>
@@ -680,6 +733,12 @@ function renderRanking(assessores){
       </div>
       <div class="rp" style="color:${pc}">${p.toFixed(0)}%</div>
       <div class="rr ${roaCls}">${roaStr}</div>
+      <div class="ri">
+        <span class="ri-badge ${l1cls}">L${a.l1}</span>
+        <span class="ri-badge ${r1cls}">R${a.r1}</span>
+        <span class="ri-badge ${r2cls}">${a.r2}</span>
+        <span class="ri-badge ${r3cls}">${a.r3}</span>
+      </div>
     </div>`;
   }).join('');
 
@@ -745,7 +804,7 @@ function renderDashboard(assessores,metaTotal){
   kpiProjSub.textContent=(proj>=metaTotal?'▲':'▼')+' '+projPct+' da meta';
   kpiProjSub.className='kpi-card-sub '+(proj>=metaTotal?'good':'warn');
 
-  // Filiais
+  // Filiais — painel esquerdo mostra só Torres e Blumenau
   const fil={
     matriz:  {cap:0,meta:0,aais:[]},
     torres:  {cap:0,meta:0,aais:[]},
@@ -755,7 +814,7 @@ function renderDashboard(assessores,metaTotal){
     const f=fil[a.filialKey];
     if(f){ f.cap+=a.cap; f.meta+=a.meta; f.aais.push(a); }
   }
-  document.getElementById('cluster-list').innerHTML=FILIAL_ORDER.map(k=>{
+  document.getElementById('cluster-list').innerHTML=['torres','blumenau'].map(k=>{
     const f=fil[k]; const p=f.meta>0?f.cap/f.meta*100:0;
     const barW=Math.max(Math.min(p,100),0);
     const aaiTags=f.aais
