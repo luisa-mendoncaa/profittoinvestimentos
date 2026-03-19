@@ -618,7 +618,10 @@ function switchTab(tab){
     const el=document.getElementById('tab-'+t);
     if(el) el.classList.toggle('active', t===tab);
   });
-  if(_lastAssessores.length) renderRanking(_lastAssessores);
+  if(_lastAssessores.length){
+    renderKPIs(_lastAssessores);
+    renderRanking(_lastAssessores);
+  }
 }
 
 function toggleSort(key){
@@ -770,22 +773,24 @@ function renderRanking(assessores){
   },200);
 }
 
-function renderDashboard(assessores,metaTotal){
-  const capTotal=assessores.reduce((s,a)=>s+a.cap,0);
+
+function renderKPIs(assessores){
+  const filtered = _activeTab === 'poa'
+    ? assessores.filter(a => a.filialKey === 'matriz')
+    : assessores.filter(a => a.filialKey !== 'matriz');
+
+  const capTotal=filtered.reduce((s,a)=>s+a.cap,0);
+  const metaTotal=filtered.reduce((s,a)=>s+a.meta,0);
   const falta=Math.max(metaTotal-capTotal,0);
   const diasRest=DIAS_UTEIS_MES-DIAS_UTEIS_PASSADOS;
   const ritmo=diasRest>0?falta/diasRest:0;
   const pctTotal=metaTotal>0?capTotal/metaTotal:0;
   const pctIdeal=DIAS_UTEIS_PASSADOS/DIAS_UTEIS_MES;
   const idealVal=metaTotal*pctIdeal;
-  const defasagem=capTotal-idealVal; // positivo = adiantado, negativo = atrasado
+  const defasagem=capTotal-idealVal;
   const proj=DIAS_UTEIS_PASSADOS>0?(capTotal/DIAS_UTEIS_PASSADOS)*DIAS_UTEIS_MES:capTotal;
+  const tabLabel = _activeTab==='poa' ? `${filtered.length} assessores · Porto Alegre` : `${filtered.length} assessores · Filiais`;
 
-  // dias badge
-  const diasBadge = document.getElementById('dias-badge');
-  if(diasBadge) diasBadge.textContent = `dia ${DIAS_UTEIS_PASSADOS} de ${DIAS_UTEIS_MES}`;
-
-  // KPI cards
   const kpiTotal=document.getElementById('kpi-total');
   kpiTotal.textContent=fmt(capTotal);
   kpiTotal.className='kpi-card-val '+(capTotal<0?'neg':capTotal>=metaTotal?'good':'');
@@ -794,7 +799,6 @@ function renderDashboard(assessores,metaTotal){
   kpiTotalSub.textContent=pctStr+' da meta mensal';
   kpiTotalSub.className='kpi-card-sub '+(pctTotal>=pctIdeal?'good':'neg');
 
-  // defasagem vs ritmo ideal
   const kpiDef=document.getElementById('kpi-defasagem');
   if(kpiDef){
     const defStr = defasagem>=0
@@ -807,7 +811,7 @@ function renderDashboard(assessores,metaTotal){
   setTimeout(()=>{ document.getElementById('kpi-total-bar').style.width=Math.min(pctTotal*100,100)+'%'; },400);
 
   document.getElementById('kpi-meta').textContent=fmt(metaTotal);
-  document.getElementById('kpi-meta-sub').textContent=assessores.length+' assessores · 3 filiais';
+  document.getElementById('kpi-meta-sub').textContent=tabLabel;
 
   const kpiFalta=document.getElementById('kpi-falta');
   kpiFalta.textContent=fmt(falta);
@@ -823,6 +827,15 @@ function renderDashboard(assessores,metaTotal){
   const kpiProjSub=document.getElementById('kpi-proj-sub');
   kpiProjSub.textContent=(proj>=metaTotal?'▲':'▼')+' '+projPct+' da meta';
   kpiProjSub.className='kpi-card-sub '+(proj>=metaTotal?'good':'warn');
+}
+
+function renderDashboard(assessores,metaTotal){
+
+  // dias badge
+  const diasBadge = document.getElementById('dias-badge');
+  if(diasBadge) diasBadge.textContent = `dia ${DIAS_UTEIS_PASSADOS} de ${DIAS_UTEIS_MES}`;
+
+  renderKPIs(assessores);
 
   // Filiais — painel esquerdo mostra só Torres e Blumenau
   const fil={
