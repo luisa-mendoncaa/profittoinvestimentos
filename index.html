@@ -663,12 +663,13 @@ function switchTab(tab){
     const el=document.getElementById('tab-'+t);
     if(el) el.classList.toggle('active', t===tab);
   });
-  // painel esquerdo só aparece em POA
+  // painel esquerdo sempre visível
   const body=document.querySelector('.body');
-  if(body) body.classList.toggle('no-left', tab==='filiais');
+  if(body) body.classList.remove('no-left');
   if(_lastAssessores.length){
     renderKPIs(_lastAssessores);
     renderRanking(_lastAssessores);
+    renderSideCards(_lastAssessores);
   }
 }
 
@@ -882,17 +883,15 @@ function renderKPIs(assessores){
   kpiProjSub.className='kpi-card-sub '+(proj>=metaTotal?'good':'warn');
 }
 
-function renderDashboard(assessores,metaTotal){
+function renderSideCards(assessores){
+  const filtered = _activeTab === 'poa'
+    ? assessores.filter(a => a.filialKey === 'matriz')
+    : assessores.filter(a => a.filialKey !== 'matriz');
 
-  // dias badge
-  const diasBadge = document.getElementById('dias-badge');
-  if(diasBadge) diasBadge.textContent = `dia ${DIAS_UTEIS_PASSADOS} de ${DIAS_UTEIS_MES}`;
-
-  renderKPIs(assessores);
-
-  // Top Intensidade (soma L1+R1+R2+R3)
   const medals3=['🥇','🥈','🥉'];
-  const topInt=[...assessores]
+
+  // Top Intensidade
+  const topInt=[...filtered]
     .sort((a,b)=>(b.l1+b.r1+b.r2+b.r3)-(a.l1+a.r1+a.r2+a.r3))
     .slice(0,3);
   document.getElementById('top-intensidade').innerHTML=topInt.map((a,i)=>{
@@ -911,7 +910,7 @@ function renderDashboard(assessores,metaTotal){
   }).join('');
 
   // Top ROA
-  const topRoa=[...assessores]
+  const topRoa=[...filtered]
     .filter(a=>a.roa&&a.roa!=='—')
     .sort((a,b)=>{
       const ra=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0;
@@ -922,15 +921,26 @@ function renderDashboard(assessores,metaTotal){
   document.getElementById('top-roa').innerHTML=topRoa.map((a,i)=>{
     const roaNum=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0;
     const primeiroNome=a.nome.split(' ')[0];
-    return `<div class="side-row">
+    return `<div class="side-row" style="padding:6px 0;border-bottom:1px solid var(--border)">
       <span class="side-pos">${medals3[i]}</span>
       <span class="side-name">${primeiroNome}</span>
       <span class="side-val${roaNum>=0.35?' green':''}">${a.roa}</span>
     </div>`;
   }).join('');
+}
+
+function renderDashboard(assessores,metaTotal){
+
+  // dias badge
+  const diasBadge = document.getElementById('dias-badge');
+  if(diasBadge) diasBadge.textContent = `dia ${DIAS_UTEIS_PASSADOS} de ${DIAS_UTEIS_MES}`;
+
+  renderKPIs(assessores);
 
   document.getElementById('ranking-badge').textContent='Mês Atual';
   renderRanking(assessores);
+  renderSideCards(assessores);
+  renderSideCards(assessores);
 
   setTimeout(()=>{
     document.querySelectorAll('.nb-fill[data-w], #kpi-total-bar').forEach(el=>{
