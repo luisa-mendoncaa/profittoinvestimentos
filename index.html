@@ -102,7 +102,7 @@ html, body {
 }
 .kpi-card:last-child { border-right: none; }
 .kpi-card-label {
-  font-size: 8px; font-weight: 700; letter-spacing: 3px;
+  font-size: 10px; font-weight: 700; letter-spacing: 3px;
   color: var(--dim); text-transform: uppercase;
 }
 .kpi-card-val {
@@ -224,7 +224,7 @@ html, body {
 .rank-badge { font-size:8px; font-weight:600; letter-spacing:2px; color:var(--dim); border:1px solid var(--border); padding:3px 8px; text-transform:uppercase; }
 
 .rank-header {
-  display:grid; grid-template-columns:32px 180px 100px 140px 44px 52px 120px;
+  display:grid; grid-template-columns:32px 1fr 110px 130px 52px 58px 140px;
 
   gap:10px; padding-bottom:8px;
   border-bottom:1px solid var(--border2);
@@ -270,7 +270,7 @@ html, body {
 .nb-fill.junior { background:var(--junior); }
 
 .rank-row {
-  display:grid; grid-template-columns:32px 180px 100px 140px 44px 52px 120px;
+  display:grid; grid-template-columns:32px 1fr 110px 130px 52px 58px 140px;
   gap:10px; align-items:center;
   padding:7px 0; border-bottom:1px solid var(--border);
   animation:fadeUp 0.3s ease both;
@@ -281,7 +281,7 @@ html, body {
 .rn { font-family:'DM Mono'; font-size:11px; color:var(--dim); text-align:center; }
 .rn.top { font-size:15px; color:var(--white); }
 
-.ra-name { font-family:'DM Sans'; font-size:14px; font-weight:400; color:var(--white); }
+.ra-name { font-family:'DM Sans'; font-size:14px; font-weight:400; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ra-tag  {
   display:inline-block; margin-top:2px;
   font-size:7px; font-weight:700; letter-spacing:3px; text-transform:uppercase; padding:1px 5px;
@@ -470,7 +470,7 @@ html, body {
         <div class="rh">#</div>
         <div class="rh">Assessor</div>
         <div class="rh r sortable active" id="sort-cap" onclick="toggleSort('cap')">Captação <span class="sort-arrow">▼</span></div>
-        <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">VS Meta <span class="sort-arrow">↕</span></div>
+        <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">Falta/Sobra <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
         <div class="rh r">ROA</div>
         <div class="rh r" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center">
@@ -542,17 +542,17 @@ const DIAS_UTEIS_MES      = calcDiasUteisNoMes(_hoje.getFullYear(), _hoje.getMon
 const DIAS_UTEIS_PASSADOS = calcDiasUteisPassados(_hoje.getFullYear(), _hoje.getMonth());
 
 const METAS = {
-  'Andre Jocksch':2000000,'Andreus Machado':2000000,'Ricardo Guimaraes':2000000,
+  'Andre Jocksch':2000000,'Andreus Machado Gonçalves':2000000,'Ricardo Guimaraes':2000000,
   'Cleison Arenhart':1500000,'Diogo Possebon':1500000,'Eduardo Galarza':1500000,
-  'Gabriel Bonassi':1500000,'Mari Nichele':1500000,'Thiago Lazzarotto':1500000,
-  'Ariane Oliveira':1000000,'Erik Pergher':1000000,'Henry Silvestri':1000000,
+  'Gabriel Bonassi':1500000,'Mari Nichele':1500000,'Thiago Basso Lazzarotto':1500000,
+  'Ariane Oliveira':1000000,'Erik Pergher':1000000,'Henry Silvestri Gonçalves':1000000,
   'Rodrigo Clemente':1000000,
 };
 const NIVEIS = {
-  'Andre Jocksch':'senior','Andreus Machado':'senior','Ricardo Guimaraes':'senior',
+  'Andre Jocksch':'senior','Andreus Machado Gonçalves':'senior','Ricardo Guimaraes':'senior',
   'Cleison Arenhart':'pleno','Diogo Possebon':'pleno','Eduardo Galarza':'pleno',
-  'Gabriel Bonassi':'pleno','Mari Nichele':'pleno','Thiago Lazzarotto':'pleno',
-  'Ariane Oliveira':'junior','Erik Pergher':'junior','Henry Silvestri':'junior',
+  'Gabriel Bonassi':'pleno','Mari Nichele':'pleno','Thiago Basso Lazzarotto':'pleno',
+  'Ariane Oliveira':'junior','Erik Pergher':'junior','Henry Silvestri Gonçalves':'junior',
   'Rodrigo Clemente':'junior',
 };
 const NIVEL_LABEL = {senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
@@ -734,7 +734,7 @@ function renderRanking(assessores){
       <div class="rv ${a.cap<0?'neg':''}">${fmt(a.cap)}</div>
       <div class="rb">
         <div class="mini-track"><div class="mini-fill ${k}" data-w="${barW}"></div></div>
-        <div class="rb-meta" style="color:${vsMeta>=0?'var(--green)':'var(--red)'}">${vsMeta>=0?'▲':'▼'} ${fmt(Math.abs(vsMeta))}</div>
+        <div class="rb-meta" style="color:${vsMeta>=0?'var(--green)':'var(--red)'}">${vsMeta>=0?'+ '+fmt(vsMeta):'- '+fmt(Math.abs(vsMeta))}</div>
       </div>
       <div class="rp" style="color:${pc}">${p.toFixed(0)}%</div>
       <div class="rr ${roaCls}">${roaStr}</div>
