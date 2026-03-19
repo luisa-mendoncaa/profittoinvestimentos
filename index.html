@@ -473,7 +473,9 @@ html, body {
         <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">VS Meta <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
         <div class="rh r">ROA</div>
-        <div class="rh r">Intensidade</div>
+        <div class="rh r" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center">
+          <span>L1</span><span>R1</span><span>R2</span><span>R3</span>
+        </div>
       </div>
       <div class="rank-list" id="ranking-list">
         <div style="color:var(--dim);font-size:11px;padding:12px 0">Carregando...</div>
@@ -733,11 +735,11 @@ function renderRanking(assessores){
       </div>
       <div class="rp" style="color:${pc}">${p.toFixed(0)}%</div>
       <div class="rr ${roaCls}">${roaStr}</div>
-      <div class="ri">
-        <span class="ri-badge ${l1cls}">L${a.l1}</span>
-        <span class="ri-badge ${r1cls}">R${a.r1}</span>
-        <span class="ri-badge ${r2cls}">${a.r2}</span>
-        <span class="ri-badge ${r3cls}">${a.r3}</span>
+      <div class="ri" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px">
+        <span class="ri-badge ${l1cls}" style="text-align:center">${a.l1}</span>
+        <span class="ri-badge ${r1cls}" style="text-align:center">${a.r1}</span>
+        <span class="ri-badge ${r2cls}" style="text-align:center">${a.r2}</span>
+        <span class="ri-badge ${r3cls}" style="text-align:center">${a.r3}</span>
       </div>
     </div>`;
   }).join('');
