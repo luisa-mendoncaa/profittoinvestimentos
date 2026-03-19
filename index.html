@@ -898,13 +898,15 @@ function renderDashboard(assessores,metaTotal){
   document.getElementById('top-intensidade').innerHTML=topInt.map((a,i)=>{
     const total=a.l1+a.r1+a.r2+a.r3;
     const primeiroNome=a.nome.split(' ')[0];
-    return `<div class="side-row">
-      <span class="side-pos">${medals3[i]}</span>
-      <span class="side-name">${primeiroNome}</span>
-      <span class="side-val">${total} ativ.</span>
-    </div>
-    <div style="font-size:9px;color:var(--dim);padding-left:26px;margin-top:-4px">
-      L1:${a.l1} · R1:${a.r1} · R2:${a.r2} · R3:${a.r3}
+    return `<div style="display:flex;flex-direction:column;gap:3px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="side-row">
+        <span class="side-pos">${medals3[i]}</span>
+        <span class="side-name">${primeiroNome}</span>
+        <span class="side-val">${total} ativ.</span>
+      </div>
+      <div style="font-size:9px;color:var(--dim);padding-left:26px;letter-spacing:1px">
+        L1: ${a.l1} &nbsp;·&nbsp; R1: ${a.r1} &nbsp;·&nbsp; R2: ${a.r2} &nbsp;·&nbsp; R3: ${a.r3}
+      </div>
     </div>`;
   }).join('');
 
