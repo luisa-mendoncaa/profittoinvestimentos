@@ -224,7 +224,7 @@ html, body {
 .rank-badge { font-size:8px; font-weight:600; letter-spacing:2px; color:var(--dim); border:1px solid var(--border); padding:3px 8px; text-transform:uppercase; }
 
 .rank-header {
-  display:grid; grid-template-columns:32px 2fr 1fr 1fr 60px 70px 160px;
+  display:grid; grid-template-columns:32px 2fr 1fr 1fr 60px 70px 36px 36px 36px 36px;
 
   gap:10px; padding-bottom:8px;
   border-bottom:1px solid var(--border2);
@@ -270,7 +270,7 @@ html, body {
 .nb-fill.junior { background:var(--junior); }
 
 .rank-row {
-  display:grid; grid-template-columns:32px 2fr 1fr 1fr 60px 70px 160px;
+  display:grid; grid-template-columns:32px 2fr 1fr 1fr 60px 70px 36px 36px 36px 36px;
   gap:10px; align-items:center;
   padding:7px 0; border-bottom:1px solid var(--border);
   animation:fadeUp 0.3s ease both;
@@ -473,9 +473,10 @@ html, body {
         <div class="rh r sortable" id="sort-vs" onclick="toggleSort('vs')">Falta/Sobra <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-pct" onclick="toggleSort('pct')">% <span class="sort-arrow">↕</span></div>
         <div class="rh r sortable" id="sort-roa" onclick="toggleSort('roa')">ROA <span class="sort-arrow">↕</span></div>
-        <div class="rh r sortable" id="sort-l1" onclick="toggleSort('l1')" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;text-align:center;cursor:pointer">
-          <span>L1</span><span>R1</span><span>R2</span><span>R3</span>
-        </div>
+        <div class="rh r sortable" id="sort-l1" onclick="toggleSort('l1')" style="text-align:center">L1 <span class="sort-arrow">↕</span></div>
+        <div class="rh r sortable" id="sort-r1" onclick="toggleSort('r1')" style="text-align:center">R1 <span class="sort-arrow">↕</span></div>
+        <div class="rh r sortable" id="sort-r2" onclick="toggleSort('r2')" style="text-align:center">R2 <span class="sort-arrow">↕</span></div>
+        <div class="rh r sortable" id="sort-r3" onclick="toggleSort('r3')" style="text-align:center">R3 <span class="sort-arrow">↕</span></div>
       </div>
       <div class="rank-list" id="ranking-list">
         <div style="color:var(--dim);font-size:11px;padding:12px 0">Carregando...</div>
@@ -628,7 +629,7 @@ function toggleSort(key){
   if(sortKey===key){ sortDesc=!sortDesc; }
   else { sortKey=key; sortDesc=true; }
   // update headers
-  ['cap','vs','pct','roa','l1'].forEach(k=>{
+  ['cap','vs','pct','roa','l1','r1','r2','r3'].forEach(k=>{
     const el=document.getElementById('sort-'+k);
     if(!el) return;
     const arrow=el.querySelector('.sort-arrow');
@@ -709,7 +710,10 @@ function renderRanking(assessores){
   if(sortKey==='pct')  sorted.sort((a,b)=>{ const pa=a.meta>0?a.cap/a.meta:0; const pb=b.meta>0?b.cap/b.meta:0; return sortDesc?pb-pa:pa-pb; });
   if(sortKey==='vs')   sorted.sort((a,b)=>{ const va=a.cap-a.meta; const vb=b.cap-b.meta; return sortDesc?vb-va:va-vb; });
   if(sortKey==='roa')  sorted.sort((a,b)=>{ const ra=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0; const rb=parseFloat((b.roa||'0').replace('%','').replace(',','.'))||0; return sortDesc?rb-ra:ra-rb; });
-  if(sortKey==='l1')   sorted.sort((a,b)=>sortDesc?(b.l1+b.r1+b.r2+b.r3)-(a.l1+a.r1+a.r2+a.r3):(a.l1+a.r1+a.r2+a.r3)-(b.l1+b.r1+b.r2+b.r3));
+  if(sortKey==='l1')   sorted.sort((a,b)=>sortDesc?b.l1-a.l1:a.l1-b.l1);
+  if(sortKey==='r1')   sorted.sort((a,b)=>sortDesc?b.r1-a.r1:a.r1-b.r1);
+  if(sortKey==='r2')   sorted.sort((a,b)=>sortDesc?b.r2-a.r2:a.r2-b.r2);
+  if(sortKey==='r3')   sorted.sort((a,b)=>sortDesc?b.r3-a.r3:a.r3-b.r3);
 
   const maxCap=Math.max(...sorted.map(a=>Math.abs(a.cap)),1);
   const medals=['🥇','🥈','🥉'];
@@ -740,12 +744,10 @@ function renderRanking(assessores){
       </div>
       <div class="rp" style="color:${pc}">${p.toFixed(0)}%</div>
       <div class="rr ${roaCls}">${roaStr}</div>
-      <div class="ri" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px">
-        <span class="ri-badge ${l1cls}" style="text-align:center">${a.l1}</span>
-        <span class="ri-badge ${r1cls}" style="text-align:center">${a.r1}</span>
-        <span class="ri-badge ${r2cls}" style="text-align:center">${a.r2}</span>
-        <span class="ri-badge ${r3cls}" style="text-align:center">${a.r3}</span>
-      </div>
+      <span class="ri-badge ${l1cls}" style="text-align:center">${a.l1}</span>
+      <span class="ri-badge ${r1cls}" style="text-align:center">${a.r1}</span>
+      <span class="ri-badge ${r2cls}" style="text-align:center">${a.r2}</span>
+      <span class="ri-badge ${r3cls}" style="text-align:center">${a.r3}</span>
     </div>`;
   }).join('');
 
