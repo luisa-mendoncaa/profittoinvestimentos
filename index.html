@@ -144,12 +144,14 @@ html, body {
 
 /* ── SIDE RANKINGS ── */
 .side-card {
-  border:1px solid var(--border); padding:12px 14px;
+  border:1px solid var(--border); padding:14px 14px;
   background:rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:8px;
 }
+.side-card.intensity { border-top:2px solid var(--gold); }
+.side-card.roa       { border-top:2px solid var(--green); }
 .side-card-title {
-  font-size:8px; font-weight:700; letter-spacing:3px;
-  text-transform:uppercase; color:var(--dim); margin-bottom:2px;
+  font-size:9px; font-weight:700; letter-spacing:4px;
+  text-transform:uppercase; margin-bottom:6px;
 }
 .side-row {
   display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -158,11 +160,12 @@ html, body {
   font-family:'DM Mono'; font-size:10px; color:var(--dim); min-width:18px;
 }
 .side-name {
-  font-family:'DM Sans'; font-size:12px; flex:1;
+  font-family:'DM Sans'; font-size:14px; flex:1;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color: var(--white);
 }
 .side-val {
-  font-family:'DM Mono'; font-size:12px; font-weight:600; color:var(--gold);
+  font-family:'DM Mono'; font-size:13px; font-weight:600; color:var(--gold);
 }
 .side-val.green { color:var(--green); }
 .left {
@@ -421,6 +424,15 @@ html, body {
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+@keyframes confettiFall {
+  0%   { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(105vh) rotate(720deg); opacity:0; }
+}
+@keyframes bannerIn {
+  from { transform:translateX(-50%) translateY(-20px); opacity:0; }
+  to   { transform:translateX(-50%) translateY(0); opacity:1; }
+}
 </style>
 </head>
 <body>
@@ -487,12 +499,12 @@ html, body {
     <!-- LEFT: Top Intensidade + Top ROA -->
     <div class="left">
       <div class="clusters" id="cluster-list">
-        <div class="side-card">
-          <div class="side-card-title">⚡ Top Intensidade</div>
+        <div class="side-card intensity">
+          <div class="side-card-title" style="color:var(--gold)">⚡ Top Intensidade</div>
           <div id="top-intensidade"></div>
         </div>
-        <div class="side-card">
-          <div class="side-card-title">💰 Top ROA</div>
+        <div class="side-card roa">
+          <div class="side-card-title" style="color:var(--green)">💰 Top ROA</div>
           <div id="top-roa"></div>
         </div>
       </div>
@@ -611,7 +623,94 @@ const FILIAIS = {
 const FILIAL_LABEL = {matriz:'Matriz · Porto Alegre', torres:'Torres', blumenau:'Blumenau'};
 const FILIAL_ORDER = ['matriz','torres','blumenau'];
 
-function fmt(v){
+// ── ESTADO ANTERIOR (para detectar quem bateu meta) ──
+let _prevPct = {}; // { nome: pct }
+
+// ── CONFETE ──
+function launchConfetti(){
+  const colors=['#fbbf24','#4ade80','#f87171','#a8c5da','#e2c97e','#c3b0d6','#ffffff'];
+  for(let i=0;i<120;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`
+      position:fixed;top:-10px;
+      left:${Math.random()*100}vw;
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      z-index:9000;pointer-events:none;
+      animation:confettiFall ${1.5+Math.random()*2}s ease-in forwards;
+      animation-delay:${Math.random()*0.5}s;
+      transform:rotate(${Math.random()*360}deg);
+    `;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+  }
+}
+
+// ── SOM DE CELEBRAÇÃO ──
+function playCheer(){
+  try {
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const notes=[523,659,784,1047];
+    notes.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value=freq;
+      osc.type='sine';
+      gain.gain.setValueAtTime(0,ctx.currentTime+i*0.12);
+      gain.gain.linearRampToValueAtTime(0.18,ctx.currentTime+i*0.12+0.05);
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.12+0.3);
+      osc.start(ctx.currentTime+i*0.12);
+      osc.stop(ctx.currentTime+i*0.12+0.35);
+    });
+  } catch(e){}
+}
+
+// ── BANNER DE META BATIDA ──
+function showMetaBanner(nome){
+  const existing=document.getElementById('meta-banner');
+  if(existing) existing.remove();
+  const el=document.createElement('div');
+  el.id='meta-banner';
+  el.innerHTML=`🎉 ${nome.split(' ')[0].toUpperCase()} BATEU A META!`;
+  el.style.cssText=`
+    position:fixed;top:70px;left:50%;transform:translateX(-50%);
+    background:linear-gradient(135deg,#d4af6a,#f0e080);
+    color:#011a2a;font-family:'Outfit',sans-serif;
+    font-size:22px;font-weight:800;letter-spacing:4px;
+    padding:14px 40px;border-radius:4px;z-index:9001;
+    box-shadow:0 4px 40px rgba(212,175,106,0.6);
+    animation:bannerIn 0.4s ease;
+  `;
+  document.body.appendChild(el);
+  setTimeout(()=>{
+    el.style.transition='opacity 0.5s ease';
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),600);
+  },4000);
+}
+
+function checkMetaBatida(assessores){
+  if(Object.keys(_prevPct).length===0){
+    // primeira carga — só salva estado
+    assessores.forEach(a=>{ _prevPct[a.nome]=a.meta>0?a.cap/a.meta:0; });
+    return;
+  }
+  const novatos=[];
+  assessores.forEach(a=>{
+    const pctAtual=a.meta>0?a.cap/a.meta:0;
+    const pctAntes=_prevPct[a.nome]||0;
+    if(pctAtual>=1 && pctAntes<1) novatos.push(a.nome);
+    _prevPct[a.nome]=pctAtual;
+  });
+  if(novatos.length>0){
+    launchConfetti();
+    playCheer();
+    novatos.forEach((nome,i)=>setTimeout(()=>showMetaBanner(nome),i*1500));
+  }
+}
   if(v===null||v===undefined||isNaN(v)) return '—';
   const abs=Math.abs(v); const neg=v<0?'-':'';
   if(abs>=1000000) return neg+'R$ '+(abs/1000000).toFixed(1)+'M';
@@ -743,6 +842,7 @@ function processData(rows){
     document.getElementById('loading').classList.add('hidden');
     return;
   }
+  checkMetaBatida(assessores);
   _lastAssessores = assessores;
   renderDashboard(assessores,metaTotal);
 }
