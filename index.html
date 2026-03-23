@@ -711,6 +711,7 @@ function checkMetaBatida(assessores){
     novatos.forEach((nome,i)=>setTimeout(()=>showMetaBanner(nome),i*1500));
   }
 }
+function fmt(v){
   if(v===null||v===undefined||isNaN(v)) return '—';
   const abs=Math.abs(v); const neg=v<0?'-':'';
   if(abs>=1000000) return neg+'R$ '+(abs/1000000).toFixed(1)+'M';
