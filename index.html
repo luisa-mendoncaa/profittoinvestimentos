@@ -74,6 +74,10 @@ html, body {
 }
 .header-right { display:flex; align-items:center; gap:20px; }
 .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2.5s ease-in-out infinite; display:inline-block; margin-right:6px; }
+  live-dot.fetching {
+  background: var(--gold);
+  animation: blink 0.6s ease-in-out infinite;
+}
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 .clock { font-family:'DM Mono'; font-size:13px; color:var(--dim); }
 .live-label { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--green); text-transform:uppercase; }
