@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Profitto — Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:    #011a2a;
+  --bg:       #012032;
+  --bg2:      #01263b;
+  --bg3:      #022d45;
+  --border:   rgba(255,255,255,0.09);
+  --border2:  rgba(255,255,255,0.18);
+  --white:    #f0f0f2;
+  --dim:      rgba(240,240,242,0.32);
+  --green:    #4ade80;
+  --red:      #f87171;
+  --gold:     #d4af6a;
+  --senior:   #e2c97e;
+  --pleno:    #a8c5da;
+  --junior:   #c3b0d6;
+  --torres:   #a8b8da;
+  --blumenau: #d4a8c5;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--black);
+  color: var(--white);
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.loading-screen {
+  position:fixed; inset:0; background:var(--black); z-index:200;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+.loading-screen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+.loading-logo { width:140px; mix-blend-mode:screen; opacity:0; animation:fadeIn 0.5s ease 0.2s forwards; }
+.loading-bar-wrap { width:140px; height:1px; background:rgba(255,255,255,0.1); }
+.loading-bar { height:100%; width:0%; background:var(--white); animation:loadBar 1.4s ease 0.4s forwards; }
+.loading-text { font-size:9px; font-weight:500; letter-spacing:4px; color:var(--dim); text-transform:uppercase; opacity:0; animation:fadeIn 0.4s ease 0.7s forwards; }
+@keyframes loadBar { to { width:100%; } }
+@keyframes fadeIn  { to { opacity:1; } }
+@keyframes confettiFall { to { transform: translateY(110vh) rotate(720deg); opacity:0; } }
+.error-banner {
+  display:none; position:fixed; top:0; left:0; right:0; z-index:150;
+  background:var(--red); color:#011a2a;
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:10px 16px; text-align:center;
+}
+.error-banner.show { display:block; }
+.header {
+  position: sticky; top:0; z-index:50;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo-img { height:18px; mix-blend-mode:screen; }
+.header-right { display:flex; align-items:center; gap:10px; }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2.5s ease-in-out infinite; display:inline-block; margin-right:4px; }
+.live-dot.fetching { background:var(--gold); animation:blink 0.6s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+.clock { font-family:'DM Mono'; font-size:12px; color:var(--dim); }
+.update-info { font-size:9px; color:var(--dim); letter-spacing:0.5px; }
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  background: var(--black);
+  position: sticky; top: 45px; z-index: 40;
+}
+.tab {
+  padding: 10px 0; text-align: center;
+  font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--dim); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab.active { color: var(--white); border-bottom-color: var(--gold); }
+.kpi-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.kpi-card {
+  background: var(--black); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.kpi-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: var(--dim); text-transform: uppercase; }
+.kpi-val { font-family: 'Outfit'; font-size: 24px; font-weight: 300; line-height: 1; }
+.kpi-val.neg  { color: var(--red); }
+.kpi-val.warn { color: var(--gold); }
+.kpi-val.good { color: var(--green); }
+.kpi-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.3px; }
+.kpi-sub.neg  { color: var(--red); }
+.kpi-sub.warn { color: var(--gold); }
+.kpi-sub.good { color: var(--green); }
+.kpi-sub.dim  { color: var(--dim); }
+.kpi-bar { height: 2px; background: rgba(255,255,255,0.07); border-radius:1px; position:relative; overflow:hidden; margin-top:2px; }
+.kpi-bar-fill { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:1px; background:var(--gold); transition: width 1.2s ease; }
+.section-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 16px 8px;
+}
+.section-title { font-size: 8px; font-weight: 700; letter-spacing: 4px; color: var(--dim); text-transform: uppercase; }
+.dias-badge {
+  font-size:8px; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+  color:var(--dim); border:1px solid var(--border); padding:3px 8px; border-radius:2px;
+}
+.ranking-list { padding: 0 12px 12px; display:flex; flex-direction:column; gap:8px; }
+.rank-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+}
+.rank-card.meta-ok { border-color: rgba(212,175,106,0.4); background: rgba(212,175,106,0.05); }
+.rank-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rank-pos { font-family: 'DM Mono'; font-size: 12px; color: var(--dim); min-width: 22px; }
+.rank-pos.top { font-size: 16px; }
+.rank-name-wrap { flex: 1; }
+.rank-name { font-family: 'DM Sans'; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-tag {
+  font-size: 7px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 2px; display: inline-block; margin-top: 2px;
+}
+.rank-tag.senior { color: var(--senior); border: 1px solid rgba(226,201,126,0.25); }
+.rank-tag.pleno  { color: var(--pleno);  border: 1px solid rgba(168,197,218,0.25); }
+.rank-tag.junior { color: var(--junior); border: 1px solid rgba(195,176,214,0.25); }
+.rank-tag.torres   { color: var(--torres);   border: 1px solid rgba(168,184,218,0.25); }
+.rank-tag.blumenau { color: var(--blumenau); border: 1px solid rgba(212,168,197,0.25); }
+.rank-cap { font-family: 'Outfit'; font-size: 20px; font-weight: 300; text-align: right; }
+.rank-cap.neg { color: var(--red); }
+.rank-card-mid { display: flex; align-items: center; gap: 8px; }
+.rank-mini-track { flex: 1; height: 2px; background: rgba(255,255,255,0.07); border-radius: 1px; position: relative; overflow: hidden; }
+.rank-mini-fill { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:1px; transition: width 1.2s ease; }
+.rank-mini-fill.senior { background: var(--senior); }
+.rank-mini-fill.pleno  { background: var(--pleno); }
+.rank-mini-fill.junior { background: var(--junior); }
+.rank-mini-fill.torres   { background: var(--torres); }
+.rank-mini-fill.blumenau { background: var(--blumenau); }
+.rank-card-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 4px; }
+.rank-stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.rank-stat-label { font-size: 7px; font-weight: 700; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.rank-stat-val { font-family: 'DM Mono'; font-size: 11px; }
+.rank-stat-val.neg  { color: var(--red); }
+.rank-stat-val.warn { color: var(--gold); }
+.rank-stat-val.good { color: var(--green); }
+.rank-stat-val.dim  { color: var(--dim); }
+.ri-badge {
+  font-family: 'DM Mono'; font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 22px; border-radius: 3px;
+}
+.l1-ok { background:rgba(226,201,126,0.15); color:var(--gold); }
+.l1-0  { background:rgba(255,255,255,0.04); color:var(--dim); }
+.r1-ok { background:rgba(74,222,128,0.12);  color:var(--green); }
+.r1-0  { background:rgba(255,255,255,0.04); color:var(--dim); }
+.r2-ok { background:rgba(168,197,218,0.15); color:var(--pleno); }
+.r2-0  { background:rgba(255,255,255,0.04); color:var(--dim); }
+.r3-ok { background:rgba(195,176,214,0.15); color:var(--junior); }
+.r3-0  { background:rgba(255,255,255,0.04); color:var(--dim); }
+.roa-ok  { color: var(--green); }
+.roa-dim { color: var(--dim); }
+.nivel-bottom {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--border);
+  border-top: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.nb-card { background: var(--black); padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+.nb-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+.nb-label.senior { color: var(--senior); }
+.nb-label.pleno  { color: var(--pleno); }
+.nb-label.junior { color: var(--junior); }
+.nb-val { font-family:'Outfit'; font-size:17px; font-weight:300; line-height:1; }
+.nb-val.neg { color: var(--red); }
+.nb-row { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.nb-track { flex:1; height:2px; background:rgba(255,255,255,0.07); border-radius:1px; position:relative; overflow:hidden; }
+.nb-fill { position:absolute; top:0; left:0; height:100%; width:0%; border-radius:1px; transition:width 1.2s ease; }
+.nb-fill.senior { background:var(--senior); }
+.nb-fill.pleno  { background:var(--pleno); }
+.nb-fill.junior { background:var(--junior); }
+.nb-pct { font-family:'DM Mono'; font-size:9px; }
+.nb-pct.senior { color:var(--senior); }
+.nb-pct.pleno  { color:var(--pleno); }
+.nb-pct.junior { color:var(--junior); }
+.side-section { padding: 0 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.side-card { border: 1px solid var(--border); background: rgba(0,0,0,0.15); border-radius: 6px; padding: 14px; }
+.side-card.intensity { border-top: 2px solid var(--gold); }
+.side-card.roa       { border-top: 2px solid var(--green); }
+.side-card-title { font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; }
+.side-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.side-row:last-child { border-bottom: none; }
+.side-pos { font-family:'DM Mono'; font-size:12px; color:var(--dim); min-width:20px; }
+.side-name { font-family:'DM Sans'; font-size:14px; flex:1; }
+.side-val { font-family:'DM Mono'; font-size:13px; font-weight:600; color:var(--gold); }
+.side-val.green { color: var(--green); }
+.side-detail { font-size:9px; color:var(--dim); padding-left:24px; letter-spacing:1px; margin-top:2px; padding-bottom:4px; }
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading">
+  <img class="loading-logo" src="https://luisa-mendoncaa.github.io/profittoinvestimentos/logo.png" alt="Profitto">
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-text">Carregando dados</div>
+</div>
+
+<div class="error-banner" id="error-banner">Erro ao carregar — tentando novamente…</div>
+
+<header class="header">
+  <img class="logo-img" src="https://luisa-mendoncaa.github.io/profittoinvestimentos/logo.png" alt="Profitto">
+  <div class="header-right">
+    <span class="update-info" id="last-update">—</span>
+    <span class="live-dot" id="live-dot"></span>
+    <span class="clock" id="clock">00:00:00</span>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" id="tab-poa" onclick="switchTab('poa')">Porto Alegre</div>
+  <div class="tab" id="tab-filiais" onclick="switchTab('filiais')">Filiais</div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Captação Total</div>
+    <div class="kpi-val" id="kpi-total">—</div>
+    <div class="kpi-sub dim" id="kpi-total-sub">—</div>
+    <div class="kpi-sub" id="kpi-defasagem">—</div>
+    <div class="kpi-bar"><div class="kpi-bar-fill" id="kpi-total-bar"></div></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Meta Total</div>
+    <div class="kpi-val" id="kpi-meta">—</div>
+    <div class="kpi-sub dim" id="kpi-meta-sub">—</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Faltam</div>
+    <div class="kpi-val" id="kpi-falta">—</div>
+    <div class="kpi-sub dim" id="kpi-falta-sub">—</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Projeção Mês</div>
+    <div class="kpi-val" id="kpi-proj">—</div>
+    <div class="kpi-sub dim" id="kpi-proj-sub">—</div>
+  </div>
+</div>
+
+<div class="section-header">
+  <span class="section-title">Ranking</span>
+  <span class="dias-badge" id="dias-badge">—</span>
+</div>
+<div class="ranking-list" id="ranking-list">
+  <div style="color:var(--dim);font-size:11px;padding:8px 0">Carregando...</div>
+</div>
+
+<div class="nivel-bottom" id="nivel-bottom">
+  <div class="nb-card"><div class="nb-label senior">Sênior</div><div class="nb-val">—</div></div>
+  <div class="nb-card"><div class="nb-label pleno">Pleno</div><div class="nb-val">—</div></div>
+  <div class="nb-card"><div class="nb-label junior">Júnior</div><div class="nb-val">—</div></div>
+</div>
+
+<div class="section-header" style="margin-top:8px">
+  <span class="section-title">Destaques</span>
+</div>
+<div class="side-section">
+  <div class="side-card intensity">
+    <div class="side-card-title" style="color:var(--gold)">⚡ Top Intensidade</div>
+    <div id="top-intensidade"></div>
+  </div>
+  <div class="side-card roa">
+    <div class="side-card-title" style="color:var(--green)">💰 Top ROA</div>
+    <div id="top-roa"></div>
+  </div>
+</div>
+
+<div style="height:32px"></div>
+
+<script>
+const SHEET_ID  = '1IcGygIIk6TUQBf4Vcx-KOtD2RDK5y0dbAcELr_U6KBs';
+const API_KEY   = 'AIzaSyCu2_6jRfuXwqLC4nj-cpMX36AGeWOvXPE';
+const SHEET_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/admin_total!A1:N30?key=${API_KEY}`;
+
+const FERIADOS = new Set(['01-01','04-18','04-21','05-01','06-19','09-07','10-12','11-02','11-15','11-20','12-25','09-20']);
+function isDiaUtil(date){ const d=date.getDay(); if(d===0||d===6) return false; const k=String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0'); return !FERIADOS.has(k); }
+function calcDUM(ano,mes){ const dias=new Date(ano,mes+1,0).getDate(); let c=0; for(let d=1;d<=dias;d++) if(isDiaUtil(new Date(ano,mes,d))) c++; return c; }
+function calcDUP(ano,mes){ const hoje=new Date(); const ult=hoje.getFullYear()===ano&&hoje.getMonth()===mes?hoje.getDate():new Date(ano,mes+1,0).getDate(); let c=0; for(let d=1;d<=ult;d++) if(isDiaUtil(new Date(ano,mes,d))) c++; return c; }
+const _h=new Date();
+const DUM=calcDUM(_h.getFullYear(),_h.getMonth());
+const DUP=calcDUP(_h.getFullYear(),_h.getMonth());
+
+const METAS={'Andre Jocksch':2000000,'Andreus Machado Gonçalves':2000000,'Ricardo Guimaraes':2000000,'Cleison Arenhart':1500000,'Diogo Possebon':1500000,'Eduardo Galarza':1500000,'Gabriel Bonassi':1500000,'Mari Nichele':1500000,'Thiago Basso Lazzarotto':1500000,'Ariane Oliveira':1000000,'Erik Pergher':1000000,'Henry Silvestri Gonçalves':1000000,'Rodrigo Clemente':1000000};
+const NIVEIS={'Andre Jocksch':'senior','Andreus Machado Gonçalves':'senior','Ricardo Guimaraes':'senior','Cleison Arenhart':'pleno','Diogo Possebon':'pleno','Eduardo Galarza':'pleno','Gabriel Bonassi':'pleno','Mari Nichele':'pleno','Thiago Basso Lazzarotto':'pleno','Ariane Oliveira':'junior','Erik Pergher':'junior','Henry Silvestri Gonçalves':'junior','Rodrigo Clemente':'junior'};
+const NL={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
+const FILIAIS={'Rodrigo Clemente':'torres','Diogo Possebon':'torres','Cleison Arenhart':'blumenau'};
+
+let _tab='poa', _data=[], _prev={};
+
+function fmt(v){ if(v===null||v===undefined||isNaN(v)) return '—'; const a=Math.abs(v),n=v<0?'-':''; if(a>=1000000) return n+'R$ '+(a/1000000).toFixed(1)+'M'; if(a>=1000) return n+'R$ '+(a/1000).toFixed(0)+'K'; return n+'R$ '+a.toFixed(0); }
+function pn(s){ if(!s) return 0; let str=String(s).trim(); const neg=str.startsWith('(')&&str.endsWith(')'); if(neg) str=str.slice(1,-1); str=str.replace(/R\$|\s/g,'').replace(/\./g,'').replace(',','.'); const n=parseFloat(str); return isNaN(n)?0:(neg?-n:n); }
+function clock(){ document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR'); }
+clock(); setInterval(clock,1000);
+
+function getFiltered(){ return _tab==='poa'?_data.filter(a=>a.fk==='matriz'):_data.filter(a=>a.fk!=='matriz'); }
+
+function switchTab(t){
+  _tab=t;
+  ['poa','filiais'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('active',x===t));
+  if(_data.length){ renderAll(); }
+}
+
+function renderAll(){ renderKPIs(); renderRanking(); renderNiveis(); renderSide(); }
+
+function renderKPIs(){
+  const f=getFiltered();
+  const cap=f.reduce((s,a)=>s+a.cap,0);
+  const meta=f.reduce((s,a)=>s+a.meta,0);
+  const falta=Math.max(meta-cap,0);
+  const pct=meta>0?cap/meta:0;
+  const ideal=DUP/DUM;
+  const def=cap-meta*ideal;
+  const proj=DUP>0?(cap/DUP)*DUM:cap;
+
+  const el=document.getElementById('kpi-total');
+  el.textContent=fmt(cap); el.className='kpi-val '+(cap<0?'neg':cap>=meta?'good':'');
+  document.getElementById('kpi-total-sub').textContent=(pct*100).toFixed(1)+'% da meta';
+  document.getElementById('kpi-total-sub').className='kpi-sub '+(pct>=ideal?'good':'neg');
+  const dEl=document.getElementById('kpi-defasagem');
+  dEl.textContent=def>=0?'▲ '+fmt(def)+' acima do ritmo':'▼ '+fmt(Math.abs(def))+' abaixo do ritmo';
+  dEl.className='kpi-sub '+(def>=0?'good':'neg');
+  setTimeout(()=>{ document.getElementById('kpi-total-bar').style.width=Math.min(pct*100,100)+'%'; },400);
+
+  document.getElementById('kpi-meta').textContent=fmt(meta);
+  document.getElementById('kpi-meta-sub').textContent=f.length+(_tab==='poa'?' assessores · POA':' assessores · Filiais');
+
+  const fe=document.getElementById('kpi-falta');
+  fe.textContent=fmt(falta); fe.className='kpi-val '+(falta===0?'good':'warn');
+  document.getElementById('kpi-falta-sub').textContent=(DUM-DUP)+' dias úteis restantes';
+
+  const pe=document.getElementById('kpi-proj');
+  pe.textContent=fmt(proj); pe.className='kpi-val '+(proj>=meta?'good':proj<0?'neg':'warn');
+  document.getElementById('kpi-proj-sub').textContent=(proj>=meta?'▲':'▼')+' '+(proj/meta*100).toFixed(1)+'% da meta';
+  document.getElementById('kpi-proj-sub').className='kpi-sub '+(proj>=meta?'good':'warn');
+}
+
+function renderRanking(){
+  const f=getFiltered();
+  const sorted=[...f].sort((a,b)=>b.cap-a.cap);
+  const maxC=Math.max(...sorted.map(a=>Math.abs(a.cap)),1);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('dias-badge').textContent=`dia ${DUP} de ${DUM}`;
+  document.getElementById('ranking-list').innerHTML=sorted.map((a,i)=>{
+    const p=a.meta>0?a.cap/a.meta*100:0;
+    const bw=Math.max(Math.min(Math.abs(a.cap)/maxC*100,100),0);
+    const pc=p>=100?'var(--green)':p>=50?'var(--gold)':'var(--red)';
+    const vm=a.cap-a.meta;
+    const rs=a.roa||'—';
+    const rn=parseFloat(rs.replace('%','').replace(',','.'))||0;
+    const rc=a.roa?(rn>=0.35?'roa-ok':'roa-dim'):'roa-dim';
+    const pos=i<3?medals[i]:String(i+1).padStart(2,'0');
+    return `<div class="rank-card${p>=100?' meta-ok':''}">
+      <div class="rank-card-top">
+        <div class="rank-pos ${i<3?'top':''}">${pos}</div>
+        <div class="rank-name-wrap">
+          <div class="rank-name">${a.nome}</div>
+          <span class="rank-tag ${a.nk}">${a.nl}</span>
+        </div>
+        <div class="rank-cap ${a.cap<0?'neg':''}">${fmt(a.cap)}</div>
+      </div>
+      <div class="rank-card-mid">
+        <div class="rank-mini-track"><div class="rank-mini-fill ${a.nk}" data-w="${bw}"></div></div>
+        <span style="font-family:'DM Mono';font-size:12px;color:${vm>=0?'var(--green)':'var(--red)'}">${vm>=0?'+'+fmt(vm):fmt(vm)}</span>
+        <span style="font-family:'DM Mono';font-size:12px;color:${pc}">${p.toFixed(0)}%</span>
+      </div>
+      <div class="rank-card-bottom">
+        <div class="rank-stat"><span class="rank-stat-label">ROA</span><span class="rank-stat-val ${rc}">${rs}</span></div>
+        <div class="rank-stat"><span class="rank-stat-label">L1</span><span class="ri-badge ${a.l1>0?'l1-ok':'l1-0'}">${a.l1}</span></div>
+        <div class="rank-stat"><span class="rank-stat-label">R1</span><span class="ri-badge ${a.r1>0?'r1-ok':'r1-0'}">${a.r1}</span></div>
+        <div class="rank-stat"><span class="rank-stat-label">R2</span><span class="ri-badge ${a.r2>0?'r2-ok':'r2-0'}">${a.r2}</span></div>
+        <div class="rank-stat"><span class="rank-stat-label">R3</span><span class="ri-badge ${a.r3>0?'r3-ok':'r3-0'}">${a.r3}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{ document.querySelectorAll('.rank-mini-fill[data-w]').forEach(el=>{ el.style.width=el.getAttribute('data-w')+'%'; }); },200);
+}
+
+function renderNiveis(){
+  const f=getFiltered();
+  const nv={senior:{cap:0,meta:0},pleno:{cap:0,meta:0},junior:{cap:0,meta:0}};
+  for(const a of f){ if(nv[a.nk]){nv[a.nk].cap+=a.cap;nv[a.nk].meta+=a.meta;} }
+  const labels={senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
+  document.getElementById('nivel-bottom').innerHTML=['senior','pleno','junior'].map(k=>{
+    const n=nv[k]; const p=n.meta>0?Math.max(Math.min(n.cap/n.meta*100,100),0):0;
+    const pstr=(n.meta>0?(n.cap/n.meta*100).toFixed(0):'0')+'%';
+    return `<div class="nb-card">
+      <div class="nb-label ${k}">${labels[k]}</div>
+      <div class="nb-val ${n.cap<0?'neg':''}">${fmt(n.cap)}</div>
+      <div class="nb-row">
+        <div class="nb-track"><div class="nb-fill ${k}" data-w="${p}"></div></div>
+        <div class="nb-pct ${k}">${pstr}</div>
+      </div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>{ document.querySelectorAll('.nb-fill[data-w]').forEach(el=>{ el.style.width=el.getAttribute('data-w')+'%'; }); },200);
+}
+
+function renderSide(){
+  const f=getFiltered();
+  const m3=['🥇','🥈','🥉'];
+  const ti=[...f].sort((a,b)=>(b.l1+b.r1+b.r2+b.r3)-(a.l1+a.r1+a.r2+a.r3)).slice(0,3);
+  document.getElementById('top-intensidade').innerHTML=ti.map((a,i)=>`<div>
+    <div class="side-row">
+      <span class="side-pos">${m3[i]}</span>
+      <span class="side-name">${a.nome.split(' ')[0]}</span>
+      <span class="side-val">${a.l1+a.r1+a.r2+a.r3} ativ.</span>
+    </div>
+    <div class="side-detail">L1: ${a.l1} · R1: ${a.r1} · R2: ${a.r2} · R3: ${a.r3}</div>
+  </div>`).join('');
+
+  const tr=[...f].filter(a=>a.roa&&a.roa!=='—')
+    .sort((a,b)=>(parseFloat((b.roa||'0').replace('%','').replace(',','.'))||0)-(parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0))
+    .slice(0,3);
+  document.getElementById('top-roa').innerHTML=tr.map((a,i)=>{
+    const rn=parseFloat((a.roa||'0').replace('%','').replace(',','.'))||0;
+    return `<div class="side-row">
+      <span class="side-pos">${m3[i]}</span>
+      <span class="side-name">${a.nome.split(' ')[0]}</span>
+      <span class="side-val${rn>=0.35?' green':''}">${a.roa}</span>
+    </div>`;
+  }).join('');
+}
+
+function launchConfetti(){
+  const cols=['#fbbf24','#4ade80','#f87171','#a8c5da','#e2c97e','#c3b0d6','#ffffff'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`position:fixed;top:-10px;left:${Math.random()*100}vw;width:${5+Math.random()*6}px;height:${5+Math.random()*6}px;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9000;pointer-events:none;animation:confettiFall ${1.5+Math.random()*2}s ease-in forwards;animation-delay:${Math.random()*0.5}s;`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),4000);
+  }
+}
+function checkMeta(data){
+  if(!Object.keys(_prev).length){ data.forEach(a=>{ _prev[a.nome]=a.meta>0?a.cap/a.meta:0; }); return; }
+  data.forEach(a=>{ const pc=a.meta>0?a.cap/a.meta:0; if(pc>=1&&(_prev[a.nome]||0)<1) launchConfetti(); _prev[a.nome]=pc; });
+}
+
+function processData(rows){
+  if(rows[0]&&rows[0][7]){ const el=document.getElementById('last-update'); if(el) el.textContent='atualizado: '+rows[0][7].trim(); }
+  const data=[];
+  for(const row of rows){
+    if(!row||row.length<6) continue;
+    const nome=(row[1]||'').trim();
+    if(!nome||nome==='Assessor (Nome Padronizado)'||nome==='TOTAL ESCRITÓRIO'||nome.includes('PROFITTO')||nome==='#') continue;
+    const cap=pn(row[5]);
+    const meta=pn(row[6])||METAS[nome]||0;
+    if(!meta&&!cap) continue;
+    const nk=NIVEIS[nome]||'junior';
+    data.push({nome,nk,nl:NL[nk],fk:FILIAIS[nome]||'matriz',cap,meta,roa:(row[9]||'').trim(),l1:parseInt(row[10])||0,r1:parseInt(row[11])||0,r2:parseInt(row[12])||0,r3:parseInt(row[13])||0});
+  }
+  if(!data.length){ document.getElementById('error-banner').classList.add('show'); document.getElementById('loading').classList.add('hidden'); return; }
+  checkMeta(data);
+  _data=data;
+  renderAll();
+  setTimeout(()=>document.getElementById('loading').classList.add('hidden'),1200);
+}
+
+async function loadData(){
+  const dot=document.getElementById('live-dot');
+  if(dot) dot.classList.add('fetching');
+  try{
+    const res=await fetch(SHEET_URL);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    processData(json.values||[]);
+    if(dot) dot.classList.remove('fetching');
+  }catch(e){
+    console.error(e);
+    document.getElementById('error-banner').classList.add('show');
+    document.getElementById('loading').classList.add('hidden');
+    if(dot) dot.classList.remove('fetching');
+    setTimeout(loadData,30*1000);
+  }
+}
+loadData();
+setInterval(loadData,5*60*1000);
+</script>
+</body>
+</html>
