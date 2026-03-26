@@ -808,7 +808,8 @@ async function loadData(){
     document.getElementById('error-banner').classList.add('show');
     document.getElementById('loading').classList.add('hidden');
     if(dot) dot.classList.remove('fetching');
-  }
+     setTimeout(loadData, 30 * 1000);
+}
 }
 
 function processData(rows){
