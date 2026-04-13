@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23011a2a'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='20' font-weight='700' fill='%23d4af6a' text-anchor='middle'%3EP%3C/text%3E%3C/svg%3E">
 <title>Profitto Growth — Painel Operacional</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -29,7 +30,7 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 
 html, body {
-  height:100%; overflow:auto;
+  height:100%; overflow:hidden;
   font-family:'Outfit', sans-serif;
   background: var(--black);
   color: var(--white);
@@ -74,10 +75,6 @@ html, body {
 }
 .header-right { display:flex; align-items:center; gap:20px; }
 .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2.5s ease-in-out infinite; display:inline-block; margin-right:6px; }
-  live-dot.fetching {
-  background: var(--gold);
-  animation: blink 0.6s ease-in-out infinite;
-}
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 .clock { font-family:'DM Mono'; font-size:13px; color:var(--dim); }
 .live-label { font-size:8px; font-weight:600; letter-spacing:3px; color:var(--green); text-transform:uppercase; }
@@ -610,11 +607,11 @@ const METAS = {
   'Rodrigo Clemente':1000000,
 };
 const NIVEIS = {
-  'Andre Jocksch':'senior','Andreus Gonçalves':'senior','Ricardo Figueira Guimarães':'senior',
+  'Andre Jocksch':'senior','Andreus Machado Gonçalves':'senior','Ricardo Guimaraes':'senior',
   'Cleison Arenhart':'pleno','Diogo Possebon':'pleno','Eduardo Galarza':'pleno',
-  'Gabriel Bonassi':'pleno','Mari Nienow':'pleno','Thiago Basso Lazzarotto':'pleno',
-  'Ariane Oliveira':'junior','Erik Pergher':'junior','Henry Gonçalves':'junior',
-  'Rodrigo Clemente':'junior', 'Leonardo Araújo':'junior',
+  'Gabriel Bonassi':'pleno','Mari Nichele':'pleno','Thiago Basso Lazzarotto':'pleno',
+  'Ariane Oliveira':'junior','Erik Pergher':'junior','Henry Silvestri Gonçalves':'junior',
+  'Rodrigo Clemente':'junior',
 };
 const NIVEL_LABEL = {senior:'Sênior',pleno:'Pleno',junior:'Júnior'};
 
@@ -812,8 +809,7 @@ async function loadData(){
     document.getElementById('error-banner').classList.add('show');
     document.getElementById('loading').classList.add('hidden');
     if(dot) dot.classList.remove('fetching');
-     setTimeout(loadData, 30 * 1000);
-}
+  }
 }
 
 function processData(rows){
@@ -1046,6 +1042,7 @@ function renderDashboard(assessores,metaTotal){
   document.getElementById('ranking-badge').textContent='Mês Atual';
   renderRanking(assessores);
   renderSideCards(assessores);
+  renderSideCards(assessores);
 
   setTimeout(()=>{
     document.querySelectorAll('.nb-fill[data-w], #kpi-total-bar').forEach(el=>{
@@ -1059,7 +1056,7 @@ function renderDashboard(assessores,metaTotal){
 }
 
 loadData();
-setInterval(loadData,1*60*1000);
+setInterval(loadData,5*60*1000);
 </script>
 </body>
 </html>
