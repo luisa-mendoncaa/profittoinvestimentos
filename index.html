@@ -376,9 +376,13 @@ html, body {
 
 /* ── LAST UPDATE + COUNTDOWN ── */
 .update-info {
-  font-family: 'DM Mono'; font-size: 11px; color: var(--dim);
+  font-family: 'DM Mono'; font-size: 11px; color: var(--text);
   display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
-  line-height: 1.3;
+  line-height: 1.4;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 6px;
+  padding: 4px 8px;
 }
 .update-info .fetching { color: var(--green); animation: blink 1s ease-in-out infinite; }
 
